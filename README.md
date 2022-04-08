@@ -1,16 +1,11 @@
 # fluid
 
-A new Flutter project.
+A simple Material 3 (by the time it's done) music player.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+You'll need an Android device (either phyiscal or an emulator) to run this app.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```console
+# flutter run
+```
