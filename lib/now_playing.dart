@@ -10,24 +10,42 @@ class NowPlaying extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      minimum: !isPortrait
+          ? const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0)
+          : EdgeInsets.zero,
+      child: Flex(
+        direction: isPortrait ? Axis.vertical : Axis.horizontal,
         children: [
-          Column(
-            children: const [
-              AlbumCover(),
-              SongDetails(
-                title: 'placeholder song',
-                artist: 'placeholder artist',
-              ),
-            ],
-          ),
-          const Controls(),
           Container(
-            margin: const EdgeInsets.only(bottom: 32.0),
-            child: const ProgressBar(),
+            margin: isPortrait
+                ? const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0)
+                : null,
+            child: const AlbumCover(),
+          ),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SongDetails(
+                    title: 'placeholder song',
+                    artist: 'placeholder artist',
+                  ),
+                  const SongControls(),
+                  Container(
+                    margin:
+                        isPortrait ? const EdgeInsets.only(bottom: 32.0) : null,
+                    child: const ProgressBar(),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -43,7 +61,6 @@ class AlbumCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
       elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
@@ -75,31 +92,28 @@ class SongDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 32.0),
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 8.0),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Text(
-            artist,
-            style: Theme.of(context).textTheme.bodySmall,
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
-        ],
-      ),
+        ),
+        Text(
+          artist,
+          style: Theme.of(context).textTheme.bodySmall,
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
 
-class Controls extends HookConsumerWidget {
-  const Controls({Key? key}) : super(key: key);
+class SongControls extends HookConsumerWidget {
+  const SongControls({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -178,7 +192,9 @@ class ProgressBar extends ConsumerWidget {
               max: ref.watch(durationProvider),
               value: ref.watch(progressProvider),
               onChanged: (newProgress) {
-                ref.read(progressProvider.notifier).update((state) => newProgress);
+                ref
+                    .read(progressProvider.notifier)
+                    .update((state) => newProgress);
               },
             ),
           ],

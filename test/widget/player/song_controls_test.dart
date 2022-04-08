@@ -27,7 +27,7 @@ void main() {
           ],
           child: const MaterialApp(
             home: Scaffold(
-              body: Controls(),
+              body: SongControls(),
             ),
           ),
         ),
@@ -60,14 +60,14 @@ void main() {
           child: MaterialApp(
             theme: ThemeData(useMaterial3: true),
             home: const Scaffold(
-              body: Controls(),
+              body: SongControls(),
             ),
           ),
         ),
       );
 
       await expectLater(
-        find.byType(Controls),
+        find.byType(SongControls),
         matchesGoldenFile(
           'goldens/controls_${stateVariants.currentValue.toString()}.png',
         ),
