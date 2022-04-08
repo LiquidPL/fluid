@@ -5,8 +5,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Player extends StatelessWidget {
-  const Player({Key? key}) : super(key: key);
+class NowPlaying extends StatelessWidget {
+  const NowPlaying({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

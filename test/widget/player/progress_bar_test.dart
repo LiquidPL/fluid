@@ -1,4 +1,4 @@
-import 'package:fluid/player.dart';
+import 'package:fluid/now_playing.dart';
 import 'package:fluid/providers/playback_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
