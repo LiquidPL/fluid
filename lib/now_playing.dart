@@ -119,11 +119,16 @@ class SongControls extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useAnimationController(
       duration: const Duration(milliseconds: 500),
+      initialValue: ref.read(isPlayingProvider) ? 1.0 : 0.0,
     );
 
-    if (ref.read(isPlayingProvider)) {
-      controller.forward(from: 1.0);
-    }
+    ref.listen<bool>(isPlayingProvider, ((previous, next) {
+      if (next) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
+    }));
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -143,12 +148,6 @@ class SongControls extends HookConsumerWidget {
                 ),
               ),
               onPressed: () {
-                if (ref.read(isPlayingProvider)) {
-                  controller.reverse();
-                } else {
-                  controller.forward();
-                }
-
                 ref.read(isPlayingProvider.notifier).update((state) => !state);
               },
             ),
