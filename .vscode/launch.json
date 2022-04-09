@@ -22,7 +22,7 @@
             "flutterMode": "release"
         },
         {
-            "name": "Golden",
+            "name": "Generate golden image",
             "request": "launch",
             "type": "dart",
             "codeLens": {
