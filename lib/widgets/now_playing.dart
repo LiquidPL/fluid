@@ -1,8 +1,8 @@
 import 'package:fluid/helpers.dart';
 import 'package:fluid/providers/playback_state.dart';
+import 'package:fluid/widgets/album_cover.dart';
+import 'package:fluid/widgets/playback_controls.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NowPlaying extends StatelessWidget {
@@ -33,15 +33,12 @@ class NowPlaying extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SongDetails(
-                    title: 'placeholder song',
-                    artist: 'placeholder artist',
-                  ),
-                  const SongControls(),
+                  const _SongDetails(),
+                  const PlayPauseFloatingActionButton(),
                   Container(
                     margin:
                         isPortrait ? const EdgeInsets.only(bottom: 32.0) : null,
-                    child: const ProgressBar(),
+                    child: const _ProgressBar(),
                   ),
                 ],
               ),
@@ -53,57 +50,23 @@ class NowPlaying extends StatelessWidget {
   }
 }
 
-class AlbumCover extends StatelessWidget {
-  const AlbumCover({
-    Key? key,
-  }) : super(key: key);
+class _SongDetails extends ConsumerWidget {
+  const _SongDetails({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      color: Theme.of(context).colorScheme.tertiaryContainer,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: SvgPicture.asset(
-            'assets/placeholder-album-cover.svg',
-            color: Theme.of(context).colorScheme.onTertiaryContainer,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class SongDetails extends StatelessWidget {
-  const SongDetails({
-    required this.title,
-    required this.artist,
-    Key? key,
-  }) : super(key: key);
-
-  final String title;
-  final String artist;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 8.0),
           child: Text(
-            title,
+            ref.watch(songTitleProvider),
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
         ),
         Text(
-          artist,
+          ref.watch(songArtistProvider),
           style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
@@ -112,54 +75,8 @@ class SongDetails extends StatelessWidget {
   }
 }
 
-class SongControls extends HookConsumerWidget {
-  const SongControls({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = useAnimationController(
-      duration: const Duration(milliseconds: 500),
-      initialValue: ref.read(isPlayingProvider) ? 1.0 : 0.0,
-    );
-
-    ref.listen<bool>(isPlayingProvider, ((previous, next) {
-      if (next) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    }));
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: AnimatedIcon(
-                icon: AnimatedIcons.play_pause,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-                progress: CurvedAnimation(
-                  parent: controller,
-                  curve: Curves.easeInOut,
-                ),
-              ),
-              onPressed: () {
-                ref.read(isPlayingProvider.notifier).update((state) => !state);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ProgressBar extends ConsumerWidget {
-  const ProgressBar({Key? key}) : super(key: key);
+class _ProgressBar extends ConsumerWidget {
+  const _ProgressBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

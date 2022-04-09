@@ -1,5 +1,6 @@
-import 'package:fluid/now_playing.dart';
+import 'package:fluid/widgets/album_cover.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -10,6 +11,18 @@ void main() {
         body: AlbumCover(),
       ),
     ));
+
+    await tester.runAsync(() async {
+      precachePicture(
+        ExactAssetPicture(
+          SvgPicture.svgStringDecoderBuilder,
+          'assets/placeholder-album-cover.svg',
+        ),
+        tester.element(find.byType(AlbumCover)),
+      );
+    });
+
+    await tester.pumpAndSettle();
 
     await expectLater(
       find.byType(AlbumCover),
