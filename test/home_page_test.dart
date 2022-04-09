@@ -22,4 +22,25 @@ void main() {
       matchesGoldenFile('goldens/HomePage_now_playing_open.png'),
     );
   });
+
+  testWidgets(
+    'NowPlaying panel slides up when MiniPlayer is tapped',
+    (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: HomePage(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(MiniPlayer));
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byType(HomePage),
+        matchesGoldenFile('goldens/HomePage_now_playing_open.png'),
+      );
+    },
+  );
 }

@@ -60,6 +60,8 @@ class FluidApp extends StatelessWidget {
   }
 }
 
+PanelController _controller = PanelController();
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -67,7 +69,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SlidingUpPanel(
       panel: const Material(child: NowPlaying()),
-      collapsed: const MiniPlayer(),
+      collapsed: MiniPlayer(
+        onTap: () => _controller.open(),
+      ),
+      controller: _controller,
       minHeight: 80.0,
       maxHeight: MediaQuery.of(context).size.height,
       body: const Scaffold(),
