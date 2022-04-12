@@ -29,5 +29,5 @@ jobs:
           target: playstore
           api-level: 31
           arch: x86_64
-          profile: Pixel 5
+          profile: pixel_4
           script: flutter test integration_test
