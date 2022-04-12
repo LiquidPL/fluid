@@ -1,4 +1,4 @@
-import 'package:fluid/providers/playback_state.dart';
+import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

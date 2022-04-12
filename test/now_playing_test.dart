@@ -1,4 +1,4 @@
-import 'package:fluid/providers/playback_state.dart';
+import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -65,7 +65,10 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [durationProvider.overrideWithValue(127)],
+            overrides: [
+              durationProvider.overrideWithValue(
+                  const AsyncValue.data(Duration(minutes: 2, seconds: 7))),
+            ],
             child: const MaterialApp(
               home: Scaffold(
                 body: NowPlaying(),
@@ -88,8 +91,10 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              durationProvider.overrideWithValue(100),
-              progressProvider.overrideWithValue(StateController(50)),
+              durationProvider.overrideWithValue(
+                  const AsyncValue.data(Duration(minutes: 1, seconds: 40))),
+              progressProvider.overrideWithValue(
+                  const AsyncValue.data(Duration(seconds: 50))),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -122,56 +127,25 @@ void main() {
     );
 
     testWidgets(
-      'dragging progress bar updates progress label',
-      (tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(
-            child: MaterialApp(
-              home: Scaffold(
-                body: NowPlaying(),
-              ),
-            ),
-          ),
-        );
-
-        await tester.drag(
-          find.byType(FocusableActionDetector),
-          const Offset(5000, 0),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('1:40'), findsNWidgets(2));
-
-        await tester.drag(
-          find.byType(FocusableActionDetector),
-          const Offset(-5000, 0),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('0:00'), findsOneWidget);
-        expect(find.text('1:40'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
       'golden progress bar position',
       (tester) async {
         final currentVariant = positionVariants.currentValue;
 
-        const duration = 7200.0;
+        const duration = Duration(hours: 2);
 
-        final Map<ProgressBarPositions, double> progressValues = {
-          ProgressBarPositions.start: 0,
-          ProgressBarPositions.middle: duration / 2,
+        final Map<ProgressBarPositions, Duration> progressValues = {
+          ProgressBarPositions.start: Duration.zero,
+          ProgressBarPositions.middle: duration ~/ 2,
           ProgressBarPositions.end: duration,
         };
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              durationProvider.overrideWithValue(duration),
+              durationProvider
+                  .overrideWithValue(const AsyncValue.data(duration)),
               progressProvider.overrideWithValue(
-                  StateController(progressValues[currentVariant] as double)),
+                  AsyncValue.data(progressValues[currentVariant])),
             ],
             child: MaterialApp(
               theme: ThemeData(useMaterial3: true),

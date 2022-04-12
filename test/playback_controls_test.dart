@@ -1,8 +1,9 @@
-import 'package:fluid/providers/playback_state.dart';
+import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/playback_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
 enum PlaybackStates {
   playing,
@@ -26,10 +27,18 @@ void main() {
       (tester) async {
         final isPlaying = stateVariants.currentValue == PlaybackStates.playing;
 
+        final player = AudioPlayer();
+        if (isPlaying) {
+          player.play();
+        } else {
+          player.pause();
+        }
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              isPlayingProvider.overrideWithValue(StateController(isPlaying))
+              audioPlayerProvider
+                  .overrideWithProvider(Provider<AudioPlayer>((ref) => player)),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -67,6 +76,8 @@ void main() {
               matching: findIcon(!isPlaying)),
           findsOneWidget,
         );
+
+        player.dispose();
       },
       variant: stateVariants,
     );
@@ -76,9 +87,6 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [
-              isPlayingProvider.overrideWithValue(StateController(false)),
-            ],
             child: MaterialApp(
               home: Scaffold(
                 body: Row(
@@ -91,6 +99,8 @@ void main() {
             ),
           ),
         );
+
+        expect(findIcon(false), findsNWidgets(2));
 
         await tester.tap(find.byType(PlayPauseFloatingActionButton));
         await tester.pumpAndSettle();
@@ -108,12 +118,11 @@ void main() {
     testWidgets(
       'golden playing state',
       (tester) async {
-        final isPlaying = stateVariants.currentValue == PlaybackStates.playing;
-
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              isPlayingProvider.overrideWithValue(StateController(isPlaying))
+              isPlayingProvider.overrideWithValue(AsyncValue.data(
+                  stateVariants.currentValue == PlaybackStates.playing)),
             ],
             child: MaterialApp(
               theme: ThemeData(useMaterial3: true),

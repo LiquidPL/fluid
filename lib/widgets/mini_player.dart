@@ -1,5 +1,5 @@
+import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/album_cover.dart';
-import 'package:fluid/providers/playback_state.dart';
 import 'package:fluid/widgets/playback_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
