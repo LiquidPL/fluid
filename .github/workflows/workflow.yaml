@@ -9,6 +9,22 @@ env:
   flutter-channel: master
 
 jobs:
+  lint:
+    name: Lint + static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter and dependencies
+        uses: ./.github/actions/setup-flutter
+        with:
+          channel: ${{ env.flutter-channel }}
+
+      - name: Run analysis
+        run: dart analyze
+
   test:
     name: Tests (widget + unit)
     runs-on: ubuntu-latest
@@ -17,22 +33,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Cache Flutter and dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.tool_cache }}/flutter
-          key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            flutter-${{ runner.os }}-${{ env.flutter-channel }}-
-            flutter-${{ runner.os }}-
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Flutter and dependencies
+        uses: ./.github/actions/setup-flutter
         with:
           channel: ${{ env.flutter-channel }}
-
-      - name: Pull dependencies
-        run: flutter pub get
 
       - name: Run tests
         run: flutter test
@@ -49,14 +53,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Cache Flutter and dependencies
-        uses: actions/cache@v3
+      - name: Setup Flutter and dependencies
+        uses: ./.github/actions/setup-flutter
         with:
-          path: ${{ runner.tool_cache }}/flutter
-          key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            flutter-${{ runner.os }}-${{ env.flutter-channel }}-
-            flutter-${{ runner.os }}-
+          channel: ${{ env.flutter-channel }}
 
       - name: Cache AVD snapshot
         uses: actions/cache@v3
@@ -66,15 +66,6 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb/*
           key: avd-${{ matrix.api-level }}
-
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ env.flutter-channel }}
-
-      - name: Pull dependencies
-        run: flutter pub get
 
       - name: Generate AVD snapshot for cache
         if: steps.avd-cache.outputs.cache-hit != 'true'

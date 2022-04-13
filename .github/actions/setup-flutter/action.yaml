@@ -1,0 +1,26 @@
+name: Setup Flutter
+description: Downloads Flutter and installs dependencies
+inputs:
+  channel:
+    description: Flutter channel to be used
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Cache Flutter and dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ runner.tool_cache }}/flutter
+        key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          flutter-${{ runner.os }}-${{ env.flutter-channel }}-
+          flutter-${{ runner.os }}-
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: ${{ env.flutter-channel }}
+
+    - name: Pull dependencies
+      run: flutter pub get
+      shell: bash
