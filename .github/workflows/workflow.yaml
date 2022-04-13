@@ -1,0 +1,102 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  flutter-channel: master
+
+jobs:
+  test:
+    name: Tests (widget + unit)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Cache Flutter and dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-${{ env.flutter-channel }}-
+            flutter-${{ runner.os }}-
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+
+      - name: Pull dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+  integration_test:
+    name: Tests (integration)
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        api-level: [30, 31]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Cache Flutter and dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-${{ env.flutter-channel }}-
+            flutter-${{ runner.os }}-
+
+      - name: Cache AVD snapshot
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb/*
+          key: avd-${{ matrix.api-level }}
+
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+
+      - name: Pull dependencies
+        run: flutter pub get
+
+      - name: Generate AVD snapshot for cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          target: playstore
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          profile: pixel_4
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching"
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          target: playstore
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          profile: pixel_4
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: flutter test integration_test
