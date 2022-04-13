@@ -1,4 +1,4 @@
-package com.example.fluid
+package pw.liquid.fluid
 
 import io.flutter.embedding.android.FlutterActivity
 
