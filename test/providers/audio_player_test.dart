@@ -29,18 +29,18 @@ void main() {
     verifyNoMoreInteractions(player);
   });
 
-  test('progressProvider returns a valid duration', () async {
+  test('positionProvider returns a valid duration', () async {
     final player = MockAudioPlayer();
-    const progress = Duration(seconds: 30);
+    const position = Duration(seconds: 30);
 
-    when(player.positionStream).thenAnswer((_) => Stream.value(progress));
+    when(player.positionStream).thenAnswer((_) => Stream.value(position));
 
     final container = ProviderContainer(
       overrides: [audioPlayerProvider.overrideWithValue(player)],
     );
     addTearDown(container.dispose);
 
-    container.listen(progressProvider, (_, AsyncValue<Duration?> next) {
+    container.listen(positionProvider, (_, AsyncValue<Duration?> next) {
       expect(next.value, const Duration(seconds: 30));
     });
 

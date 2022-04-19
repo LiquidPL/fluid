@@ -106,7 +106,7 @@ class _ProgressBar extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      formatDuration(ref.watch(progressProvider).value),
+                      formatDuration(ref.watch(positionProvider).value),
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     Text(
@@ -118,7 +118,7 @@ class _ProgressBar extends ConsumerWidget {
             Slider(
               min: 0,
               max: duration,
-              value: ref.watch(progressProvider).maybeWhen(
+              value: ref.watch(positionProvider).maybeWhen(
                     data: (data) {
                       final double position =
                           data != null ? data.inMilliseconds / 1000 : 0;

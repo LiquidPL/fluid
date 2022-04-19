@@ -51,7 +51,7 @@ void main() {
           ProviderScope(
             overrides: [
               audioPlayerProvider.overrideWithValue(player),
-              progressProvider
+              positionProvider
                   .overrideWithValue(const AsyncValue.data(Duration.zero)),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(Duration.zero)),
@@ -105,14 +105,14 @@ void main() {
     );
 
     testWidgets(
-      'song progress is displayed correctly',
+      'song position is displayed correctly',
       (tester) async {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
               durationProvider.overrideWithValue(
                   const AsyncValue.data(Duration(minutes: 1, seconds: 40))),
-              progressProvider.overrideWithValue(
+              positionProvider.overrideWithValue(
                   const AsyncValue.data(Duration(seconds: 50))),
             ],
             child: const MaterialApp(
@@ -152,7 +152,7 @@ void main() {
 
         const duration = Duration(hours: 2);
 
-        final Map<ProgressBarPositions, Duration> progressValues = {
+        final Map<ProgressBarPositions, Duration> positionValues = {
           ProgressBarPositions.start: Duration.zero,
           ProgressBarPositions.middle: duration ~/ 2,
           ProgressBarPositions.end: duration,
@@ -166,8 +166,8 @@ void main() {
               audioPlayerProvider.overrideWithValue(player),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(duration)),
-              progressProvider.overrideWithValue(
-                  AsyncValue.data(progressValues[currentVariant])),
+              positionProvider.overrideWithValue(
+                  AsyncValue.data(positionValues[currentVariant])),
               songTitleProvider
                   .overrideWithValue(const AsyncValue.data('test title')),
               songArtistProvider

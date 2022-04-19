@@ -22,7 +22,7 @@ void main() {
               .overrideWithValue(const AsyncValue.data('test title')),
           songArtistProvider
               .overrideWithValue(const AsyncValue.data('test artist')),
-          progressProvider
+          positionProvider
               .overrideWithValue(const AsyncValue.data(Duration.zero)),
           durationProvider
               .overrideWithValue(const AsyncValue.data(Duration.zero)),
@@ -55,7 +55,7 @@ void main() {
                 .overrideWithValue(const AsyncValue.data('test title')),
             songArtistProvider
                 .overrideWithValue(const AsyncValue.data('test artist')),
-            progressProvider
+            positionProvider
                 .overrideWithValue(const AsyncValue.data(Duration.zero)),
             durationProvider
                 .overrideWithValue(const AsyncValue.data(Duration.zero)),

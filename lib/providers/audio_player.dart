@@ -21,7 +21,7 @@ final isPlayingProvider =
 final durationProvider = StreamProvider<Duration?>(
     (ref) => ref.watch(audioPlayerProvider).durationStream);
 
-final progressProvider = StreamProvider<Duration?>(
+final positionProvider = StreamProvider<Duration?>(
     (ref) => ref.watch(audioPlayerProvider).positionStream);
 
 final songTitleProvider = StreamProvider<String>((ref) =>
