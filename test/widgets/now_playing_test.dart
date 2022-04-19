@@ -4,12 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:mockito/annotations.dart';
+
+import 'helpers.dart';
+import 'now_playing_test.mocks.dart';
 
 enum ProgressBarPositions { start, middle, end }
 
 final ValueVariant<ProgressBarPositions> positionVariants =
     ValueVariant<ProgressBarPositions>(ProgressBarPositions.values.toSet());
 
+@GenerateMocks([AudioPlayer])
 void main() {
   group('song details', () {
     testWidgets(
@@ -18,8 +24,10 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              songTitleProvider.overrideWithValue('test title'),
-              songArtistProvider.overrideWithValue('test artist'),
+              songTitleProvider
+                  .overrideWithValue(const AsyncValue.data('test title')),
+              songArtistProvider
+                  .overrideWithValue(const AsyncValue.data('test artist')),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -37,11 +45,20 @@ void main() {
     testWidgets(
       'golden',
       (tester) async {
+        final player = MockAudioPlayer();
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              songTitleProvider.overrideWithValue('test title'),
-              songArtistProvider.overrideWithValue('test artist'),
+              audioPlayerProvider.overrideWithValue(player),
+              progressProvider
+                  .overrideWithValue(const AsyncValue.data(Duration.zero)),
+              durationProvider
+                  .overrideWithValue(const AsyncValue.data(Duration.zero)),
+              songTitleProvider
+                  .overrideWithValue(const AsyncValue.data('test title')),
+              songArtistProvider
+                  .overrideWithValue(const AsyncValue.data('test artist')),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -50,6 +67,8 @@ void main() {
             ),
           ),
         );
+
+        await precachePlaceholderAlbumCover(tester);
 
         await expectLater(
           find.byType(NowPlaying),
@@ -139,13 +158,20 @@ void main() {
           ProgressBarPositions.end: duration,
         };
 
+        final player = MockAudioPlayer();
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              audioPlayerProvider.overrideWithValue(player),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(duration)),
               progressProvider.overrideWithValue(
                   AsyncValue.data(progressValues[currentVariant])),
+              songTitleProvider
+                  .overrideWithValue(const AsyncValue.data('test title')),
+              songArtistProvider
+                  .overrideWithValue(const AsyncValue.data('test artist')),
             ],
             child: MaterialApp(
               theme: ThemeData(useMaterial3: true),
@@ -155,6 +181,8 @@ void main() {
             ),
           ),
         );
+
+        await precachePlaceholderAlbumCover(tester);
 
         await tester.runAsync(() async {
           precachePicture(

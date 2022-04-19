@@ -32,12 +32,15 @@ class MiniPlayer extends HookConsumerWidget {
                     Container(
                       margin: const EdgeInsets.only(bottom: 4.0),
                       child: Text(
-                        ref.watch(songTitleProvider),
+                        ref.watch(songTitleProvider).maybeWhen(
+                            data: (value) => value, orElse: () => ''),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
                     Text(
-                      ref.watch(songArtistProvider),
+                      ref
+                          .watch(songArtistProvider)
+                          .maybeWhen(data: (value) => value, orElse: () => ''),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

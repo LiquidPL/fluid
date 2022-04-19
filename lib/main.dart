@@ -1,6 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fluid/constants.dart';
+import 'package:fluid/models/audio_metadata.dart';
 import 'package:fluid/providers/audio_player.dart';
+import 'package:fluid/providers/player_queue.dart';
 import 'package:fluid/widgets/mini_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +69,8 @@ PanelController _controller = PanelController();
 class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
+  static const platform = MethodChannel('fluid.liquid.pw');
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SlidingUpPanel(
@@ -79,19 +83,36 @@ class HomePage extends ConsumerWidget {
       maxHeight: MediaQuery.of(context).size.height,
       body: Scaffold(
         body: Center(
-          child: TextButton(
-            child: const Text('start'),
-            onPressed: () async {
-              if (await Permission.storage.status.isDenied) {
-                await Permission.storage.request();
-              }
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                child: const Text('start'),
+                onPressed: () async {
+                  if (await Permission.storage.status.isDenied) {
+                    await Permission.storage.request();
+                  }
 
-              // update line below to point to an audio file
-              // located in the internal storage
-              // await ref.read(audioPlayerProvider).setFilePath('');
+                  List<Map> songsRaw =
+                      await platform.invokeListMethod('getAudioFiles') ?? [];
 
-              await ref.read(audioPlayerProvider).play();
-            },
+                  final List<AudioMetadata> songs = [];
+
+                  for (var song in songsRaw) {
+                    songs.add(AudioMetadata(
+                      title: song['title'],
+                      artist: song['artist'],
+                      uri: song['uri'],
+                      duration: Duration(milliseconds: song['duration']),
+                    ));
+                  }
+
+                  await ref.read(playerQueueProvider.notifier).addAll(songs);
+
+                  await ref.read(audioPlayerProvider).play();
+                },
+              ),
+            ],
           ),
         ),
       ),

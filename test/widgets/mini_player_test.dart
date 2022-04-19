@@ -1,10 +1,14 @@
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/mini_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+
+import 'helpers.dart';
+import 'mini_player_test.mocks.dart';
 
 abstract class _OnTap {
   void call();
@@ -12,6 +16,7 @@ abstract class _OnTap {
 
 class _OnTapMock extends Mock implements _OnTap {}
 
+@GenerateMocks([AudioPlayer])
 void main() {
   testWidgets(
     'song title and artist are displayed correctly',
@@ -19,8 +24,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            songTitleProvider.overrideWithValue('test title'),
-            songArtistProvider.overrideWithValue('test artist')
+            songTitleProvider
+                .overrideWithValue(const AsyncValue.data('test title')),
+            songArtistProvider
+                .overrideWithValue(const AsyncValue.data('test artist')),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -62,11 +69,16 @@ void main() {
   testWidgets(
     'golden',
     (tester) async {
+      final player = MockAudioPlayer();
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            songTitleProvider.overrideWithValue('test title'),
-            songArtistProvider.overrideWithValue('test artist')
+            audioPlayerProvider.overrideWithValue(player),
+            songTitleProvider
+                .overrideWithValue(const AsyncValue.data('test title')),
+            songArtistProvider
+                .overrideWithValue(const AsyncValue.data('test artist')),
           ],
           child: const MaterialApp(
               home: Scaffold(
@@ -75,17 +87,7 @@ void main() {
         ),
       );
 
-      await tester.runAsync(() async {
-        precachePicture(
-          ExactAssetPicture(
-            SvgPicture.svgStringDecoderBuilder,
-            'assets/placeholder-album-cover.svg',
-          ),
-          tester.element(find.byType(MiniPlayer)),
-        );
-      });
-
-      await tester.pumpAndSettle();
+      await precachePlaceholderAlbumCover(tester);
 
       await expectLater(
         find.byType(MiniPlayer),

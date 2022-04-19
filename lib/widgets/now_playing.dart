@@ -63,13 +63,17 @@ class _SongDetails extends ConsumerWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 8.0),
           child: Text(
-            ref.watch(songTitleProvider),
+            ref
+                .watch(songTitleProvider)
+                .maybeWhen(data: (value) => value, orElse: () => ''),
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
         ),
         Text(
-          ref.watch(songArtistProvider),
+          ref
+              .watch(songArtistProvider)
+              .maybeWhen(data: (value) => value, orElse: () => ''),
           style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
