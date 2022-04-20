@@ -10,6 +10,7 @@ void main() {
     'dragging progress bar updates progress label',
     (tester) async {
       final player = AudioPlayer();
+      addTearDown(player.dispose);
 
       await tester.pumpWidget(
         ProviderScope(

@@ -28,6 +28,7 @@ void main() {
         final isPlaying = stateVariants.currentValue == PlaybackStates.playing;
 
         final player = AudioPlayer();
+        addTearDown(player.dispose);
         if (isPlaying) {
           player.play();
         } else {
@@ -76,8 +77,6 @@ void main() {
               matching: findIcon(!isPlaying)),
           findsOneWidget,
         );
-
-        player.dispose();
       },
       variant: stateVariants,
     );
