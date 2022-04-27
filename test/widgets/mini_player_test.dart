@@ -3,12 +3,9 @@ import 'package:fluid/widgets/mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'helpers.dart';
-import 'mini_player_test.mocks.dart';
 
 abstract class _OnTap {
   void call();
@@ -16,7 +13,6 @@ abstract class _OnTap {
 
 class _OnTapMock extends Mock implements _OnTap {}
 
-@GenerateMocks([AudioPlayer])
 void main() {
   testWidgets(
     'song title and artist are displayed correctly',
@@ -69,12 +65,10 @@ void main() {
   testWidgets(
     'golden',
     (tester) async {
-      final player = MockAudioPlayer();
-
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            audioPlayerProvider.overrideWithValue(player),
+            audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
             songTitleProvider
                 .overrideWithValue(const AsyncValue.data('test title')),
             songArtistProvider

@@ -24,24 +24,24 @@ final durationProvider = StreamProvider<Duration?>(
 final positionProvider = StreamProvider<Duration?>(
     (ref) => ref.watch(audioPlayerProvider).positionStream);
 
-final songTitleProvider = StreamProvider<String>((ref) =>
-    ref.watch(audioPlayerProvider).sequenceStateStream.asyncMap((state) {
-      if (state == null ||
-          state.currentSource == null ||
-          state.currentSource!.tag == null) {
-        return '';
-      }
+final songTitleProvider = StreamProvider<String>(
+    (ref) => ref.watch(audioPlayerProvider).sequenceStateStream.map((state) {
+          if (state == null ||
+              state.currentSource == null ||
+              state.currentSource!.tag == null) {
+            return '';
+          }
 
-      return state.currentSource!.tag.title;
-    }));
+          return state.currentSource!.tag.title;
+        }));
 
-final songArtistProvider = StreamProvider<String>((ref) =>
-    ref.watch(audioPlayerProvider).sequenceStateStream.asyncMap((state) {
-      if (state == null ||
-          state.currentSource == null ||
-          state.currentSource!.tag == null) {
-        return '';
-      }
+final songArtistProvider = StreamProvider<String>(
+    (ref) => ref.watch(audioPlayerProvider).sequenceStateStream.map((state) {
+          if (state == null ||
+              state.currentSource == null ||
+              state.currentSource!.tag == null) {
+            return '';
+          }
 
-      return state.currentSource!.tag.artist;
-    }));
+          return state.currentSource!.tag.artist;
+        }));

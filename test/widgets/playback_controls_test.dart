@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import 'helpers.dart';
+
 enum PlaybackStates {
   playing,
   paused,
@@ -13,14 +15,14 @@ enum PlaybackStates {
 final ValueVariant<PlaybackStates> stateVariants =
     ValueVariant<PlaybackStates>(PlaybackStates.values.toSet());
 
-void main() {
-  Finder findIcon(bool isPlaying) {
-    return find.byWidgetPredicate((widget) =>
-        widget is AnimatedIcon &&
-        widget.icon == AnimatedIcons.play_pause &&
-        widget.progress.value == (isPlaying ? 1.0 : 0.0));
-  }
+Finder _findIcon(bool isPlaying) {
+  return find.byWidgetPredicate((widget) =>
+      widget is AnimatedIcon &&
+      widget.icon == AnimatedIcons.play_pause &&
+      widget.progress.value == (isPlaying ? 1.0 : 0.0));
+}
 
+void main() {
   group('PlayPause buttons', () {
     testWidgets(
       'play/pause button changes state when tapped',
@@ -60,7 +62,7 @@ void main() {
         expect(
           find.descendant(
             of: find.byType(PlayPauseFloatingActionButton),
-            matching: findIcon(!isPlaying),
+            matching: _findIcon(!isPlaying),
           ),
           findsOneWidget,
         );
@@ -74,7 +76,7 @@ void main() {
         expect(
           find.descendant(
               of: find.byType(PlayPauseIconButton),
-              matching: findIcon(!isPlaying)),
+              matching: _findIcon(!isPlaying)),
           findsOneWidget,
         );
       },
@@ -99,7 +101,7 @@ void main() {
           ),
         );
 
-        expect(findIcon(false), findsNWidgets(2));
+        expect(_findIcon(false), findsNWidgets(2));
 
         await tester.tap(find.byType(PlayPauseFloatingActionButton));
         await tester.pumpAndSettle();
@@ -107,7 +109,7 @@ void main() {
         expect(
           find.descendant(
             of: find.byType(PlayPauseIconButton),
-            matching: findIcon(true),
+            matching: _findIcon(true),
           ),
           findsOneWidget,
         );
@@ -148,6 +150,236 @@ void main() {
         );
       },
       variant: stateVariants,
+    );
+  });
+
+  group('SkipNextButton', () {
+    testWidgets(
+      'is enabled when not at the end of the queue',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(
+                  mockPlayerWithNQueueElements(count: 2, currentIndex: 0)),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipNextButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipNextButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNotNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when at the end of the queue',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(
+                  mockPlayerWithNQueueElements(count: 2, currentIndex: 1)),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipNextButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipNextButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when the queue is empty',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipNextButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipNextButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when the queue is null',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(mockPlayerWithNullQueue()),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipNextButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipNextButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+  });
+
+  group('SkipPreviousButton', () {
+    testWidgets(
+      'is enabled when not at the beginning of the queue',
+      (tester) async {
+        await tester.pumpWidget(ProviderScope(
+          overrides: [
+            audioPlayerProvider.overrideWithValue(
+              mockPlayerWithNQueueElements(count: 2, currentIndex: 1),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SkipPreviousButton(),
+            ),
+          ),
+        ));
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipPreviousButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNotNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when at the beginning of the queue',
+      (tester) async {
+        await tester.pumpWidget(ProviderScope(
+          overrides: [
+            audioPlayerProvider.overrideWithValue(
+              mockPlayerWithNQueueElements(count: 2, currentIndex: 0),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SkipPreviousButton(),
+            ),
+          ),
+        ));
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipPreviousButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when the queue is empty',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipPreviousButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipPreviousButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'is disabled when the queue is null',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(mockPlayerWithNullQueue()),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipPreviousButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final buttonFinder = find.descendant(
+          of: find.byType(SkipPreviousButton),
+          matching: find.byType(IconButton),
+        );
+
+        expect(buttonFinder, findsOneWidget);
+        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
     );
   });
 }

@@ -35,7 +35,17 @@ class NowPlaying extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const _SongDetails(),
-                    const PlayPauseFloatingActionButton(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SkipPreviousButton(),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: const PlayPauseFloatingActionButton(),
+                        ),
+                        const SkipNextButton(),
+                      ],
+                    ),
                     Container(
                       margin: isPortrait
                           ? const EdgeInsets.only(bottom: 32.0)

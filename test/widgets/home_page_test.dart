@@ -4,20 +4,16 @@ import 'package:fluid/widgets/mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:mockito/annotations.dart';
 
-import 'home_page_test.mocks.dart';
+import 'helpers.dart';
 
-@GenerateMocks([AudioPlayer])
 void main() {
   testWidgets('NowPlaying panel slides up from the bottom', (tester) async {
-    final player = MockAudioPlayer();
-
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          audioPlayerProvider.overrideWithValue(player),
+          audioPlayerProvider
+              .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
           songTitleProvider
               .overrideWithValue(const AsyncValue.data('test title')),
           songArtistProvider
@@ -45,12 +41,11 @@ void main() {
   testWidgets(
     'NowPlaying panel slides up when MiniPlayer is tapped',
     (tester) async {
-      final player = MockAudioPlayer();
-
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            audioPlayerProvider.overrideWithValue(player),
+            audioPlayerProvider
+                .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
             songTitleProvider
                 .overrideWithValue(const AsyncValue.data('test title')),
             songArtistProvider

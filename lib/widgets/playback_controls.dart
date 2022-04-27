@@ -45,6 +45,48 @@ class PlayPauseIconButton extends HookConsumerWidget {
   }
 }
 
+final _nextButtonEnabled = StreamProvider<bool>((ref) {
+  return ref.watch(audioPlayerProvider).sequenceStateStream.map(
+      (sequenceState) =>
+          (sequenceState != null && sequenceState.sequence.isNotEmpty)
+              ? sequenceState.currentIndex < sequenceState.sequence.length - 1
+              : false);
+});
+
+final _previousButtonEnabled = StreamProvider<bool>((ref) {
+  return ref.watch(audioPlayerProvider).sequenceStateStream.map(
+      (sequenceState) =>
+          sequenceState != null ? sequenceState.currentIndex > 0 : false);
+});
+
+class SkipNextButton extends ConsumerWidget {
+  const SkipNextButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      icon: const Icon(Icons.skip_next),
+      onPressed: ref.watch(_nextButtonEnabled).value ?? false
+          ? () async => ref.read(audioPlayerProvider).seekToNext()
+          : null,
+    );
+  }
+}
+
+class SkipPreviousButton extends ConsumerWidget {
+  const SkipPreviousButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      icon: const Icon(Icons.skip_previous),
+      onPressed: ref.watch(_previousButtonEnabled).value ?? false
+          ? () async => ref.read(audioPlayerProvider).seekToPrevious()
+          : null,
+    );
+  }
+}
+
 AnimationController _usePlayPauseButtonAnimationController(WidgetRef ref) {
   final AnimationController controller = useAnimationController(
     duration: const Duration(milliseconds: 500),

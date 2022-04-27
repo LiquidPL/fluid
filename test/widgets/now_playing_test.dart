@@ -4,18 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:mockito/annotations.dart';
 
 import 'helpers.dart';
-import 'now_playing_test.mocks.dart';
 
 enum ProgressBarPositions { start, middle, end }
 
 final ValueVariant<ProgressBarPositions> positionVariants =
     ValueVariant<ProgressBarPositions>(ProgressBarPositions.values.toSet());
 
-@GenerateMocks([AudioPlayer])
 void main() {
   group('song details', () {
     testWidgets(
@@ -45,12 +41,11 @@ void main() {
     testWidgets(
       'golden',
       (tester) async {
-        final player = MockAudioPlayer();
-
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(player),
+              audioPlayerProvider
+                  .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
               positionProvider
                   .overrideWithValue(const AsyncValue.data(Duration.zero)),
               durationProvider
@@ -129,7 +124,7 @@ void main() {
     );
 
     testWidgets(
-      'progress bar is displayed correctly',
+      'progress bar is present',
       (tester) async {
         await tester.pumpWidget(
           const ProviderScope(
@@ -158,12 +153,11 @@ void main() {
           ProgressBarPositions.end: duration,
         };
 
-        final player = MockAudioPlayer();
-
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(player),
+              audioPlayerProvider
+                  .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(duration)),
               positionProvider.overrideWithValue(

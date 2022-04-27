@@ -1,6 +1,11 @@
 import 'package:fluid/widgets/album_cover.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+
+import 'helpers.mocks.dart';
 
 ///
 /// Loads and caches the SVG image displayed as the album cover placeholder.
@@ -20,4 +25,50 @@ Future<void> precachePlaceholderAlbumCover(WidgetTester tester) async {
   });
 
   await tester.pumpAndSettle();
+}
+
+@GenerateMocks([AudioPlayer])
+MockAudioPlayer mockPlayerWithQueue({
+  List<IndexedAudioSource>? sequence,
+  int currentIndex = 0,
+}) {
+  final player = MockAudioPlayer();
+  final sequenceState = sequence != null
+      ? SequenceState(
+          sequence,
+          currentIndex,
+          sequence.asMap().keys.toList(),
+          false,
+          LoopMode.off,
+        )
+      : null;
+
+  when(player.sequenceStream).thenAnswer((_) => Stream.value(sequence));
+  when(player.sequence).thenReturn(sequence);
+
+  when(player.sequenceStateStream)
+      .thenAnswer((_) => Stream.value(sequenceState));
+  when(player.sequenceState).thenReturn(sequenceState);
+
+  return player;
+}
+
+MockAudioPlayer mockPlayerWithEmptyQueue() =>
+    mockPlayerWithQueue(sequence: [], currentIndex: 0);
+
+MockAudioPlayer mockPlayerWithNullQueue() =>
+    mockPlayerWithQueue(sequence: null);
+
+MockAudioPlayer mockPlayerWithNQueueElements({
+  required int count,
+  int currentIndex = 0,
+}) {
+  final sequence = List<IndexedAudioSource>.generate(
+    count,
+    (i) => AudioSource.uri(
+      Uri.parse('content://media/external/audio/media/$i'),
+    ),
+  );
+
+  return mockPlayerWithQueue(sequence: sequence, currentIndex: currentIndex);
 }
