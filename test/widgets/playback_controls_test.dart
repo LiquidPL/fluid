@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:mockito/mockito.dart';
 
 import 'helpers.dart';
 
@@ -34,7 +35,7 @@ void main() {
         if (isPlaying) {
           player.play();
         } else {
-          player.pause();
+          await player.stop();
         }
 
         await tester.pumpWidget(
@@ -267,6 +268,32 @@ void main() {
         expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
       },
     );
+
+    testWidgets(
+      'skips to next song when pressed',
+      (tester) async {
+        final player = mockPlayerWithNQueueElements(count: 2, currentIndex: 0);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(player),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipNextButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(SkipNextButton));
+        await tester.pumpAndSettle();
+
+        verify(player.seek(Duration.zero, index: 1)).called(1);
+      },
+    );
   });
 
   group('SkipPreviousButton', () {
@@ -379,6 +406,33 @@ void main() {
 
         expect(buttonFinder, findsOneWidget);
         expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'skips to previous song when pressed',
+      (tester) async {
+        final player = mockPlayerWithNQueueElements(count: 2, currentIndex: 1);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(player),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SkipPreviousButton(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(SkipPreviousButton));
+        await tester.pumpAndSettle();
+
+        // verify(player.seek(Duration.zero, index: 1)).called(1);
+        verify(await player.seekToPrevious()).called(1);
       },
     );
   });

@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../test/widgets/playback_controls_test.dart';
+
 ConcatenatingAudioSource _createListOfSources(int count) {
   return ConcatenatingAudioSource(
     children: List<IndexedAudioSource>.generate(
@@ -16,6 +18,65 @@ ConcatenatingAudioSource _createListOfSources(int count) {
 }
 
 void main() {
+  group('PlayPauseButton', () {
+    testWidgets(
+      'playing state changes when pressed',
+      (tester) async {
+        final isPlaying = stateVariants.currentValue == PlaybackStates.playing;
+
+        final player = AudioPlayer();
+        addTearDown(player.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              audioPlayerProvider.overrideWithValue(player),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: Row(
+                  children: const [
+                    PlayPauseFloatingActionButton(),
+                    PlayPauseIconButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await player.setAudioSource(_createListOfSources(1));
+
+        if (isPlaying) {
+          player.play();
+        } else {
+          await player.stop();
+        }
+        await tester.pumpAndSettle();
+
+        expect(player.playing, isPlaying);
+
+        await tester.tap(find.byType(PlayPauseFloatingActionButton));
+        await tester.pumpAndSettle();
+
+        expect(player.playing, !isPlaying);
+
+        await tester.tap(find.byType(PlayPauseFloatingActionButton));
+        await tester.pumpAndSettle();
+
+        expect(player.playing, isPlaying);
+
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(PlayPauseIconButton));
+        await tester.pumpAndSettle();
+
+        expect(player.playing, !isPlaying);
+      },
+      variant: stateVariants,
+    );
+  });
+
   group('SkipNextButton', () {
     testWidgets(
       'is enabled when not at the end of the queue',
@@ -99,6 +160,35 @@ void main() {
 
         expect(buttonFinder, findsOneWidget);
         expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'skips to next song when pressed',
+      (tester) async {
+        final player = AudioPlayer();
+        addTearDown(player.dispose);
+
+        await tester.pumpWidget(ProviderScope(
+          overrides: [
+            audioPlayerProvider.overrideWithValue(player),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SkipNextButton(),
+            ),
+          ),
+        ));
+
+        await player.setAudioSource(_createListOfSources(2));
+        await player.seek(Duration.zero, index: 0);
+
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(SkipNextButton));
+        await tester.pumpAndSettle();
+
+        expect(player.sequenceState!.currentIndex, 1);
       },
     );
   });
@@ -186,6 +276,35 @@ void main() {
 
         expect(buttonFinder, findsOneWidget);
         expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
+      },
+    );
+
+    testWidgets(
+      'skips to previous song when pressed',
+      (tester) async {
+        final player = AudioPlayer();
+        addTearDown(player.dispose);
+
+        await tester.pumpWidget(ProviderScope(
+          overrides: [
+            audioPlayerProvider.overrideWithValue(player),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SkipPreviousButton(),
+            ),
+          ),
+        ));
+
+        await player.setAudioSource(_createListOfSources(2));
+        await player.seek(Duration.zero, index: 1);
+
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(SkipPreviousButton));
+        await tester.pumpAndSettle();
+
+        expect(player.sequenceState!.currentIndex, 0);
       },
     );
   });
