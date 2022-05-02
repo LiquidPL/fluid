@@ -291,7 +291,7 @@ void main() {
         await tester.tap(find.byType(SkipNextButton));
         await tester.pumpAndSettle();
 
-        verify(player.seek(Duration.zero, index: 1)).called(1);
+        verify(player.seekToNext()).called(1);
       },
     );
   });
