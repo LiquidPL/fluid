@@ -1,29 +1,19 @@
 import 'package:fluid/main.dart';
-import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/mini_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'helpers.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 void main() {
-  testWidgets('NowPlaying panel slides up from the bottom', (tester) async {
+  testWidgets('now playing panel slides up from the MiniPlayer at the bottom',
+      (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          audioPlayerProvider
-              .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
-          songTitleProvider
-              .overrideWithValue(const AsyncValue.data('test title')),
-          songArtistProvider
-              .overrideWithValue(const AsyncValue.data('test artist')),
-          positionProvider
-              .overrideWithValue(const AsyncValue.data(Duration.zero)),
-          durationProvider
-              .overrideWithValue(const AsyncValue.data(Duration.zero)),
-        ],
-        child: const MaterialApp(
+      const ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: HomePage(),
         ),
       ),
@@ -32,30 +22,22 @@ void main() {
     await tester.drag(find.byType(MiniPlayer), const Offset(0, -500));
     await tester.pumpAndSettle();
 
-    await expectLater(
-      find.byType(HomePage),
-      matchesGoldenFile('goldens/HomePage_now_playing_open.png'),
-    );
+    final finder = find.byKey(const Key('nowPlayingPanel'));
+    expect(finder, findsOneWidget);
+
+    final panel = tester.firstWidget<SlidingUpPanel>(finder);
+
+    expect(panel.controller?.isPanelOpen, isTrue);
   });
 
   testWidgets(
-    'NowPlaying panel slides up when MiniPlayer is tapped',
+    'now playing panel slides up when MiniPlayer is tapped',
     (tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            audioPlayerProvider
-                .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
-            songTitleProvider
-                .overrideWithValue(const AsyncValue.data('test title')),
-            songArtistProvider
-                .overrideWithValue(const AsyncValue.data('test artist')),
-            positionProvider
-                .overrideWithValue(const AsyncValue.data(Duration.zero)),
-            durationProvider
-                .overrideWithValue(const AsyncValue.data(Duration.zero)),
-          ],
-          child: const MaterialApp(
+        const ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: HomePage(),
           ),
         ),
@@ -64,10 +46,12 @@ void main() {
       await tester.tap(find.byType(MiniPlayer));
       await tester.pumpAndSettle();
 
-      await expectLater(
-        find.byType(HomePage),
-        matchesGoldenFile('goldens/HomePage_now_playing_open.png'),
-      );
+      final finder = find.byKey(const Key('nowPlayingPanel'));
+      expect(finder, findsOneWidget);
+
+      final panel = tester.firstWidget<SlidingUpPanel>(finder);
+
+      expect(panel.controller?.isPanelOpen, isTrue);
     },
   );
 }

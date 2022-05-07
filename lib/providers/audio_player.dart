@@ -24,6 +24,11 @@ final durationProvider = StreamProvider<Duration?>(
 final positionProvider = StreamProvider<Duration?>(
     (ref) => ref.watch(audioPlayerProvider).positionStream);
 
+final currentQueueIndexProvider = StreamProvider<int?>((ref) => ref
+    .watch(audioPlayerProvider)
+    .sequenceStateStream
+    .map((state) => state?.currentIndex));
+
 final songTitleProvider = StreamProvider<String>(
     (ref) => ref.watch(audioPlayerProvider).sequenceStateStream.map((state) {
           if (state == null ||

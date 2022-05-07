@@ -32,6 +32,7 @@
 .pub/
 /build/
 **/*.mocks.dart
+test/**/failures/*.png
 
 # Web related
 lib/generated_plugin_registrant.dart

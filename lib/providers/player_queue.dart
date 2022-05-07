@@ -28,6 +28,8 @@ class PlayerQueueNotifier extends StateNotifier<List<AudioMetadata>> {
   }
 
   List<AudioMetadata> get currentQueue => state;
+
+  int get length => state.length;
 }
 
 final playerQueueProvider =

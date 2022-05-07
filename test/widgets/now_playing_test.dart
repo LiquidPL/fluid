@@ -1,9 +1,11 @@
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'helpers.dart';
 
@@ -26,6 +28,8 @@ void main() {
                   .overrideWithValue(const AsyncValue.data('test artist')),
             ],
             child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: NowPlaying(),
               ),
@@ -56,6 +60,8 @@ void main() {
                   .overrideWithValue(const AsyncValue.data('test artist')),
             ],
             child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: NowPlaying(),
               ),
@@ -84,6 +90,8 @@ void main() {
                   const AsyncValue.data(Duration(minutes: 2, seconds: 7))),
             ],
             child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: NowPlaying(),
               ),
@@ -111,6 +119,8 @@ void main() {
                   const AsyncValue.data(Duration(seconds: 50))),
             ],
             child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: NowPlaying(),
               ),
@@ -129,6 +139,8 @@ void main() {
         await tester.pumpWidget(
           const ProviderScope(
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: NowPlaying(),
               ),
@@ -169,6 +181,8 @@ void main() {
             ],
             child: MaterialApp(
               theme: ThemeData(useMaterial3: true),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: const Scaffold(
                 body: NowPlaying(),
               ),
@@ -200,6 +214,97 @@ void main() {
         );
       },
       variant: positionVariants,
+    );
+  });
+
+  group('NowPlayingQueue', () {
+    testWidgets(
+      'queue slides up from open player queue panel at the bottom',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: NowPlaying(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.drag(
+          find.text('OPEN PLAYER QUEUE'),
+          const Offset(0, -500),
+        );
+        await tester.pumpAndSettle();
+
+        final finder = find.byType(SlidingUpPanel);
+        expect(finder, findsOneWidget);
+
+        expect(
+          tester.firstWidget<SlidingUpPanel>(finder).controller?.isPanelOpen,
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets(
+      'queue slides up when the open player queue button is tapped',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: NowPlaying(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('OPEN PLAYER QUEUE'));
+        await tester.pumpAndSettle();
+
+        final finder = find.byType(SlidingUpPanel);
+        expect(finder, findsOneWidget);
+
+        expect(
+          tester.firstWidget<SlidingUpPanel>(finder).controller?.isPanelOpen,
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets(
+      'queue slides up when the open player queue panel is tapped',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: NowPlaying(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tapAt(
+          tester.getTopLeft(find.byKey(const Key('showPlayerQueuePanel'))),
+        );
+        await tester.pumpAndSettle();
+
+        final finder = find.byType(SlidingUpPanel);
+        expect(finder, findsOneWidget);
+
+        expect(
+          tester.firstWidget<SlidingUpPanel>(finder).controller?.isPanelOpen,
+          isTrue,
+        );
+      },
     );
   });
 }
