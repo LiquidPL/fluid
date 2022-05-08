@@ -2,7 +2,7 @@ import 'package:fluid/widgets/album_cover.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
 void main() {
   testWidgets('golden', (tester) async {

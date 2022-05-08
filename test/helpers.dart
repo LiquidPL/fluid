@@ -1,3 +1,4 @@
+import 'package:fluid/models/audio_metadata.dart';
 import 'package:fluid/widgets/album_cover.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -71,4 +72,24 @@ MockAudioPlayer mockPlayerWithNQueueElements({
   );
 
   return mockPlayerWithQueue(sequence: sequence, currentIndex: currentIndex);
+}
+
+List<AudioMetadata> createListOfAudioMetadata(int count) {
+  return List<AudioMetadata>.generate(
+    count,
+    (index) => AudioMetadata(
+      uri: 'asset:///integration_test/assets/silence_1m40s.ogg',
+      title: 'song $index',
+      artist: 'test artist',
+      duration: const Duration(minutes: 1, seconds: 40),
+    ),
+  );
+}
+
+ConcatenatingAudioSource createListOfSources(int count) {
+  return ConcatenatingAudioSource(
+    children: createListOfAudioMetadata(count)
+        .map((metadata) => metadata.asAudioSource)
+        .toList(),
+  );
 }

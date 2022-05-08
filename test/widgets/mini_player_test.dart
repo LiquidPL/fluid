@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/mockito.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
 abstract class _OnTap {
   void call();

@@ -1,6 +1,7 @@
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -19,6 +20,8 @@ void main() {
                 .overrideWithProvider(Provider<AudioPlayer>((ref) => player)),
           ],
           child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: NowPlaying(),
             ),

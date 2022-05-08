@@ -1,0 +1,11 @@
+{
+    "upNext": "Up next",
+    "@upNext": {
+        "description": "Displayed at the top of the now playing queue"
+    },
+
+    "playerQueue": "open player queue",
+    "@playerQueue": {
+        "description": "Displayed in the now playing view, as a button to open the list of queued songs"
+    }
+}

@@ -25,7 +25,7 @@ jobs:
       - name: Run analysis
         run: |
           flutter pub run build_runner build
-          dart analyze
+          flutter analyze
 
   test:
     name: Tests (widget + unit)

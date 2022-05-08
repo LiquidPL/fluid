@@ -5,17 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../test/helpers.dart';
 import '../../test/widgets/playback_controls_test.dart';
-
-ConcatenatingAudioSource _createListOfSources(int count) {
-  return ConcatenatingAudioSource(
-    children: List<IndexedAudioSource>.generate(
-      count,
-      (_) => AudioSource.uri(
-          Uri.parse('asset:///integration_test/assets/silence_1m40s.ogg')),
-    ),
-  );
-}
 
 void main() {
   group('PlayPauseButton', () {
@@ -45,7 +36,7 @@ void main() {
           ),
         );
 
-        await player.setAudioSource(_createListOfSources(1));
+        await player.setAudioSource(createListOfSources(1));
 
         if (isPlaying) {
           player.play();
@@ -95,7 +86,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -127,7 +118,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();
@@ -180,7 +171,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -211,7 +202,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();
@@ -243,7 +234,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -296,7 +287,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(_createListOfSources(2));
+        await player.setAudioSource(createListOfSources(2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();

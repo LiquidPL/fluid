@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:mockito/mockito.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
 enum PlaybackStates {
   playing,
