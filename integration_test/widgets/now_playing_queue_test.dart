@@ -36,11 +36,13 @@ void main() {
 
       for (int i in Iterable.generate(4)) {
         await tester.tap(find.text('song $i'));
-        await tester.pumpAndSettle();
+
+        // wait longer to ensure AudioPlayer has begun to play the file
+        // this is particularly important since the playback might take longer
+        // to start in low-performance scenarios, for instance in CI runners
+        await tester.pumpAndSettle(const Duration(seconds: 2));
 
         expect(container.read(audioPlayerProvider).currentIndex, i);
-        expect(container.read(audioPlayerProvider).position,
-            lessThan(const Duration(milliseconds: 500)));
 
         final widget = tester.firstWidget<ListTile>(
           find.ancestor(
