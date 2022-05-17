@@ -4,6 +4,9 @@ inputs:
   channel:
     description: Flutter channel to be used
     required: true
+  version:
+    description: Flutter version to be used
+    required: true
 runs:
   using: composite
   steps:
@@ -11,16 +14,15 @@ runs:
       uses: actions/cache@v3
       with:
         path: ${{ runner.tool_cache }}/flutter
-        key: flutter-${{ runner.os }}-${{ env.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}
+        key: flutter-${{ runner.os }}-${{ inputs.channel }}-${{ inputs.version }}-${{ hashFiles('**/pubspec.lock') }}
         restore-keys: |
-          flutter-${{ runner.os }}-${{ env.flutter-channel }}-
-          flutter-${{ runner.os }}-
+          flutter-${{ runner.os }}-${{ inputs.channel }}-${{ inputs.version }}-
 
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: ${{ env.flutter-channel }}
-        flutter-version: ${{ env.flutter-version }}
+        channel: ${{ inputs.channel }}
+        flutter-version: ${{ inputs.version }}
 
     - name: Pull dependencies
       run: flutter pub get
