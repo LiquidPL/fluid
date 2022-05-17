@@ -50,7 +50,7 @@ jobs:
 
   integration_test:
     name: Tests (integration)
-    runs-on: macos-latest
+    runs-on: self-hosted
 
     strategy:
       matrix:
