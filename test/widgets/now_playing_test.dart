@@ -1,5 +1,6 @@
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
+import 'package:fluid/widgets/now_playing_queue.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -303,6 +304,44 @@ void main() {
         expect(
           tester.firstWidget<SlidingUpPanel>(finder).controller?.isPanelOpen,
           isTrue,
+        );
+      },
+    );
+
+    testWidgets(
+      'queue closes when tapped on the arrow button',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: NowPlaying(),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tapAt(
+          tester.getTopLeft(find.byKey(const Key('showPlayerQueuePanel'))),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.descendant(
+            of: find.byType(NowPlayingQueue),
+            matching: find.byType(IconButton),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final finder = find.byType(SlidingUpPanel);
+        expect(finder, findsOneWidget);
+
+        expect(
+          tester.firstWidget<SlidingUpPanel>(finder).controller?.isPanelOpen,
+          isFalse,
         );
       },
     );
