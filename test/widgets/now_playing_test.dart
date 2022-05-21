@@ -60,10 +60,11 @@ void main() {
               songArtistProvider
                   .overrideWithValue(const AsyncValue.data('test artist')),
             ],
-            child: const MaterialApp(
+            child: MaterialApp(
+              theme: ThemeData(useMaterial3: true),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(
+              home: const Scaffold(
                 body: NowPlaying(),
               ),
             ),

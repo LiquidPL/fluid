@@ -12,11 +12,14 @@ class MiniPlayer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Material(
+      color: Theme.of(context).colorScheme.surface,
+      surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
+      elevation: Theme.of(context).navigationBarTheme.elevation ?? 3.0,
       child: InkWell(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
-          height: 80.0,
+          height: 70.0,
           child: Row(
             children: [
               Container(

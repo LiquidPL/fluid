@@ -145,6 +145,7 @@ class _HomePageState extends State<HomePage> {
       controller: panelController,
       minHeight: miniPlayerHeight,
       maxHeight: MediaQuery.of(context).size.height,
+      boxShadow: const [],
       body: const Scaffold(
         body: _StartButton(),
       ),
