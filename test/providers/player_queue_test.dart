@@ -1,4 +1,4 @@
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/providers/player_queue.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,35 +9,35 @@ import 'package:mockito/mockito.dart';
 
 import 'player_queue_test.mocks.dart';
 
-const _metadata1 = AudioMetadata(
+const _audioFile1 = AudioFile(
   uri: 'content://media/external/audio/media/1',
   title: 'title 1',
   artist: 'artist',
   duration: Duration.zero,
 );
 
-const _metadata2 = AudioMetadata(
+const _audioFile2 = AudioFile(
   uri: 'content://media/external/audio/media/2',
   title: 'title 2',
   artist: 'artist',
   duration: Duration.zero,
 );
 
-class _IsAudioMetadata extends Matcher {
-  _IsAudioMetadata(this._metadata);
+class _IsAudioFile extends Matcher {
+  _IsAudioFile(this._audioFile);
 
-  late final AudioMetadata _metadata;
+  late final AudioFile _audioFile;
 
   @override
   Description describe(Description description) => description
-      .add('\'UriAudioSource\' matching provided \'AudioMetadata\'')
-      .add(': (${_metadata.uri}, ${_metadata.title})');
+      .add('\'UriAudioSource\' matching provided \'AudioFile\'')
+      .add(': (${_audioFile.uri}, ${_audioFile.title})');
 
   @override
   bool matches(item, Map matchState) {
     return item is UriAudioSource &&
-        item.uri == _metadata.asAudioSource.uri &&
-        item.tag == _metadata;
+        item.uri == _audioFile.asAudioSource.uri &&
+        item.tag == _audioFile;
   }
 
   @override
@@ -58,13 +58,13 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
-    await container.read(playerQueueProvider.notifier).add(_metadata1);
+    await container.read(playerQueueProvider.notifier).add(_audioFile1);
 
-    expect(container.read(playerQueueProvider), [_metadata1]);
+    expect(container.read(playerQueueProvider), [_audioFile1]);
 
-    await container.read(playerQueueProvider.notifier).add(_metadata2);
+    await container.read(playerQueueProvider.notifier).add(_audioFile2);
 
-    expect(container.read(playerQueueProvider), [_metadata1, _metadata2]);
+    expect(container.read(playerQueueProvider), [_audioFile1, _audioFile2]);
   });
 
   test('add() updates the player audio source playlist', () async {
@@ -74,10 +74,9 @@ void main() {
         overrides: [playlistProvider.overrideWithValue(audioSource)]);
     addTearDown(container.dispose);
 
-    await container.read(playerQueueProvider.notifier).add(_metadata1);
+    await container.read(playerQueueProvider.notifier).add(_audioFile1);
 
-    verify(await audioSource.add(argThat(_IsAudioMetadata(_metadata1))))
-        .called(1);
+    verify(await audioSource.add(argThat(_IsAudioFile(_audioFile1)))).called(1);
   });
 
   test('addAll() adds many items to the queue', () async {
@@ -86,9 +85,9 @@ void main() {
 
     await container
         .read(playerQueueProvider.notifier)
-        .addAll([_metadata1, _metadata2]);
+        .addAll([_audioFile1, _audioFile2]);
 
-    expect(container.read(playerQueueProvider), [_metadata1, _metadata2]);
+    expect(container.read(playerQueueProvider), [_audioFile1, _audioFile2]);
   });
 
   test('addAll() updates the player audio source playlist', () async {
@@ -100,10 +99,10 @@ void main() {
 
     await container
         .read(playerQueueProvider.notifier)
-        .addAll([_metadata1, _metadata2]);
+        .addAll([_audioFile1, _audioFile2]);
 
     expect(verify(audioSource.addAll(captureAny)).captured.single,
-        [_IsAudioMetadata(_metadata1), _IsAudioMetadata(_metadata2)]);
+        [_IsAudioFile(_audioFile1), _IsAudioFile(_audioFile2)]);
   });
 
   test('clear() removes all items from the queue', () async {
@@ -112,7 +111,7 @@ void main() {
 
     await container
         .read(playerQueueProvider.notifier)
-        .addAll([_metadata1, _metadata2]);
+        .addAll([_audioFile1, _audioFile2]);
     await container.read(playerQueueProvider.notifier).clear();
 
     expect(container.read(playerQueueProvider), isEmpty);
@@ -127,7 +126,7 @@ void main() {
 
     await container
         .read(playerQueueProvider.notifier)
-        .addAll([_metadata1, _metadata2]);
+        .addAll([_audioFile1, _audioFile2]);
     await container.read(playerQueueProvider.notifier).clear();
 
     verify(audioSource.clear()).called(1);

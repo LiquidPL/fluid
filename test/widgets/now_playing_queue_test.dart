@@ -42,7 +42,7 @@ void main() {
 
       await container
           .read(playerQueueProvider.notifier)
-          .addAll(createListOfAudioMetadata(4));
+          .addAll(createListOfAudioFiles(4));
 
       await tester.pumpAndSettle();
 

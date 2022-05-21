@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
 @immutable
-class AudioMetadata {
-  const AudioMetadata({
+class AudioFile {
+  const AudioFile({
     required this.uri,
     required this.title,
     required this.artist,

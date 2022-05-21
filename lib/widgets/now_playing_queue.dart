@@ -1,5 +1,5 @@
 import 'package:fluid/helpers.dart';
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/providers/player_queue.dart';
 import 'package:fluid/widgets/album_cover.dart';
@@ -41,7 +41,7 @@ class NowPlayingQueue extends ConsumerWidget {
             delegate: SliverChildBuilderDelegate(
               childCount: queue.length,
               (context, index) => _QueueItem(
-                metadata: queue[index],
+                audioFile: queue[index],
                 queueIndex: index,
                 key: ObjectKey(queue[index]),
               ),
@@ -55,20 +55,20 @@ class NowPlayingQueue extends ConsumerWidget {
 
 class _QueueItem extends ConsumerWidget {
   const _QueueItem({
-    required this.metadata,
+    required this.audioFile,
     required this.queueIndex,
     Key? key,
   }) : super(key: key);
 
-  final AudioMetadata metadata;
+  final AudioFile audioFile;
   final int queueIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      title: Text(metadata.title),
+      title: Text(audioFile.title),
       subtitle: Text(
-        '${metadata.artist} • ${formatDuration(metadata.duration)}',
+        '${audioFile.artist} • ${formatDuration(audioFile.duration)}',
       ),
       leading: const AlbumCover(),
       trailing: Text((queueIndex + 1).toString()),

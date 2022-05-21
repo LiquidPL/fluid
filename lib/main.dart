@@ -1,6 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fluid/constants.dart';
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/providers/player_queue.dart';
 import 'package:fluid/widgets/mini_player.dart';
@@ -90,21 +90,21 @@ class _StartButton extends ConsumerWidget {
                 await Permission.storage.request();
               }
 
-              List<Map> songsRaw =
+              List<Map> filesRaw =
                   await platform.invokeListMethod('getAudioFiles') ?? [];
 
-              final List<AudioMetadata> songs = [];
+              final List<AudioFile> audioFiles = [];
 
-              for (var song in songsRaw) {
-                songs.add(AudioMetadata(
-                  title: song['title'],
-                  artist: song['artist'],
-                  uri: song['uri'],
-                  duration: Duration(milliseconds: song['duration']),
+              for (var file in filesRaw) {
+                audioFiles.add(AudioFile(
+                  title: file['title'],
+                  artist: file['artist'],
+                  uri: file['uri'],
+                  duration: Duration(milliseconds: file['duration']),
                 ));
               }
 
-              await ref.read(playerQueueProvider.notifier).addAll(songs);
+              await ref.read(playerQueueProvider.notifier).addAll(audioFiles);
 
               await ref.read(audioPlayerProvider).play();
             },

@@ -1,4 +1,4 @@
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/widgets/album_cover.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -74,10 +74,10 @@ MockAudioPlayer mockPlayerWithNQueueElements({
   return mockPlayerWithQueue(sequence: sequence, currentIndex: currentIndex);
 }
 
-List<AudioMetadata> createListOfAudioMetadata(int count) {
-  return List<AudioMetadata>.generate(
+List<AudioFile> createListOfAudioFiles(int count) {
+  return List<AudioFile>.generate(
     count,
-    (index) => AudioMetadata(
+    (index) => AudioFile(
       uri: 'asset:///integration_test/assets/silence_1m40s.ogg',
       title: 'song $index',
       artist: 'test artist',
@@ -88,8 +88,8 @@ List<AudioMetadata> createListOfAudioMetadata(int count) {
 
 ConcatenatingAudioSource createListOfSources(int count) {
   return ConcatenatingAudioSource(
-    children: createListOfAudioMetadata(count)
-        .map((metadata) => metadata.asAudioSource)
+    children: createListOfAudioFiles(count)
+        .map((audioFile) => audioFile.asAudioSource)
         .toList(),
   );
 }

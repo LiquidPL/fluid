@@ -1,24 +1,24 @@
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class PlayerQueueNotifier extends StateNotifier<List<AudioMetadata>> {
+class PlayerQueueNotifier extends StateNotifier<List<AudioFile>> {
   PlayerQueueNotifier(this.ref) : super([]);
 
   final Ref ref;
 
-  Future<void> add(AudioMetadata song) async {
-    state = [...state, song];
+  Future<void> add(AudioFile audioFile) async {
+    state = [...state, audioFile];
 
-    await ref.read(playlistProvider).add(song.asAudioSource);
+    await ref.read(playlistProvider).add(audioFile.asAudioSource);
   }
 
-  Future<void> addAll(List<AudioMetadata> songs) async {
-    state = [...state, ...songs];
+  Future<void> addAll(List<AudioFile> audioFiles) async {
+    state = [...state, ...audioFiles];
 
     await ref
         .read(playlistProvider)
-        .addAll(songs.map((song) => song.asAudioSource).toList());
+        .addAll(audioFiles.map((file) => file.asAudioSource).toList());
   }
 
   Future<void> clear() async {
@@ -27,9 +27,9 @@ class PlayerQueueNotifier extends StateNotifier<List<AudioMetadata>> {
     await ref.read(playlistProvider).clear();
   }
 
-  List<AudioMetadata> get currentQueue => state;
+  List<AudioFile> get currentQueue => state;
 }
 
 final playerQueueProvider =
-    StateNotifierProvider<PlayerQueueNotifier, List<AudioMetadata>>(
+    StateNotifierProvider<PlayerQueueNotifier, List<AudioFile>>(
         (ref) => PlayerQueueNotifier(ref));

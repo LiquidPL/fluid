@@ -1,4 +1,4 @@
-import 'package:fluid/models/audio_metadata.dart';
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -63,7 +63,7 @@ void main() {
     test(
       'returns a valid title',
       () async {
-        const metadata = AudioMetadata(
+        const audioFile = AudioFile(
           uri: 'content://media/external/audio/media/727',
           title: 'test title',
           artist: 'test artist',
@@ -73,7 +73,7 @@ void main() {
         final player = MockAudioPlayer();
         final sequenceState = MockSequenceState();
 
-        when(sequenceState.currentSource).thenReturn(metadata.asAudioSource);
+        when(sequenceState.currentSource).thenReturn(audioFile.asAudioSource);
         when(player.sequenceStateStream)
             .thenAnswer((_) => Stream.value(sequenceState));
 
@@ -117,7 +117,7 @@ void main() {
     test(
       'returns a valid artist name',
       () async {
-        const metadata = AudioMetadata(
+        const audioFile = AudioFile(
           uri: 'content://media/external/audio/media/727',
           title: 'test title',
           artist: 'test artist',
@@ -127,7 +127,7 @@ void main() {
         final player = MockAudioPlayer();
         final sequenceState = MockSequenceState();
 
-        when(sequenceState.currentSource).thenReturn(metadata.asAudioSource);
+        when(sequenceState.currentSource).thenReturn(audioFile.asAudioSource);
         when(player.sequenceStateStream)
             .thenAnswer((_) => Stream.value(sequenceState));
 
