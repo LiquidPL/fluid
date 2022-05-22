@@ -27,7 +27,7 @@ void main() {
           ],
           child: const MaterialApp(
             home: Scaffold(
-              body: MiniPlayer(),
+              body: MiniPlayer(height: 70.0),
             ),
           ),
         ),
@@ -48,6 +48,7 @@ void main() {
           child: MaterialApp(
             home: Scaffold(
               body: MiniPlayer(
+                height: 70.0,
                 onTap: onTap,
               ),
             ),
@@ -75,9 +76,10 @@ void main() {
                 .overrideWithValue(const AsyncValue.data('test artist')),
           ],
           child: const MaterialApp(
-              home: Scaffold(
-            body: MiniPlayer(),
-          )),
+            home: Scaffold(
+              body: MiniPlayer(height: 70.0),
+            ),
+          ),
         ),
       );
 

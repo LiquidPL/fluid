@@ -5,9 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MiniPlayer extends HookConsumerWidget {
-  const MiniPlayer({this.onTap, Key? key}) : super(key: key);
+  const MiniPlayer({
+    required this.height,
+    this.onTap,
+    Key? key,
+  }) : super(key: key);
 
   final GestureTapCallback? onTap;
+  final double height;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,7 +24,7 @@ class MiniPlayer extends HookConsumerWidget {
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
-          height: 70.0,
+          height: height,
           child: Row(
             children: [
               Container(
