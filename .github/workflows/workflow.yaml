@@ -51,6 +51,7 @@ jobs:
   integration_test:
     name: Tests (integration)
     runs-on: self-hosted
+    if: ${{ false }}
 
     strategy:
       matrix:
