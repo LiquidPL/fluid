@@ -31,6 +31,8 @@
 .pub-cache/
 .pub/
 /build/
+libisar.so
+lib/**/*.g.dart
 **/*.mocks.dart
 test/**/failures/*.png
 

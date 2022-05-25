@@ -38,6 +38,9 @@ dependencies:
   flutter_hooks: ^0.18.3
   hooks_riverpod: ^1.0.3
 
+  isar: 3.0.0-dev.0
+  isar_flutter_libs: 3.0.0-dev.0
+
   intl: ^0.17.0
 
   dynamic_color: ^1.2.0
@@ -48,7 +51,14 @@ dependencies:
       url: https://github.com/LiquidPL/sliding_up_panel.git
       ref: fix-is-panel-open-closed-state
 
+  on_audio_query:
+    git:
+      url: https://github.com/LiquidPL/on_audio_query.git
+      ref: development
+      path: on_audio_query
+
   permission_handler: ^9.2.0
+  path_provider: ^2.0.10
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +69,7 @@ dev_dependencies:
   test: ^1.20.2
   mockito: ^5.1.0
   build_runner: ^2.1.10
+  isar_generator: 3.0.0-dev.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -63,11 +63,11 @@ void main() {
     test(
       'returns a valid title',
       () async {
-        const audioFile = AudioFile(
+        final audioFile = AudioFile(
           uri: 'content://media/external/audio/media/727',
           title: 'test title',
           artist: 'test artist',
-          duration: Duration(minutes: 1),
+          duration: const Duration(minutes: 1),
         );
 
         final player = MockAudioPlayer();
@@ -117,11 +117,11 @@ void main() {
     test(
       'returns a valid artist name',
       () async {
-        const audioFile = AudioFile(
+        final audioFile = AudioFile(
           uri: 'content://media/external/audio/media/727',
           title: 'test title',
           artist: 'test artist',
-          duration: Duration(minutes: 1),
+          duration: const Duration(minutes: 1),
         );
 
         final player = MockAudioPlayer();

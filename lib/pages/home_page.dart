@@ -1,22 +1,23 @@
+import 'package:fluid/media_store.dart';
 import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
+import 'package:fluid/providers/database.dart';
 import 'package:fluid/providers/player_queue.dart';
 import 'package:fluid/widgets/mini_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:isar/isar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulHookConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   late final PanelController panelController;
 
   static const _miniPlayerHeight = 70.0;
@@ -40,53 +41,35 @@ class _HomePageState extends State<HomePage> {
       minHeight: _miniPlayerHeight,
       maxHeight: MediaQuery.of(context).size.height,
       boxShadow: const [],
-      body: const Scaffold(
-        body: _StartButton(),
+      body: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () async =>
+                    await ref.read(mediaStoreProvider).scan(),
+                child: const Text('rescan'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final database = ref.read(databaseProvider);
+
+                  final audioFiles =
+                      await database.audioFiles.where().findAll();
+
+                  await ref
+                      .read(playerQueueProvider.notifier)
+                      .addAll(audioFiles);
+                  await ref.read(audioPlayerProvider).play();
+                },
+                child: const Text('play'),
+              )
+            ],
+          ),
+        ),
       ),
       key: const Key('nowPlayingPanel'),
-    );
-  }
-}
-
-class _StartButton extends ConsumerWidget {
-  const _StartButton({Key? key}) : super(key: key);
-
-  static const platform = MethodChannel('fluid.liquid.pw');
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextButton(
-            child: const Text('start'),
-            onPressed: () async {
-              if (await Permission.storage.status.isDenied) {
-                await Permission.storage.request();
-              }
-
-              List<Map> filesRaw =
-                  await platform.invokeListMethod('getAudioFiles') ?? [];
-
-              final List<AudioFile> audioFiles = [];
-
-              for (var file in filesRaw) {
-                audioFiles.add(AudioFile(
-                  title: file['title'],
-                  artist: file['artist'],
-                  uri: file['uri'],
-                  duration: Duration(milliseconds: file['duration']),
-                ));
-              }
-
-              await ref.read(playerQueueProvider.notifier).addAll(audioFiles);
-
-              await ref.read(audioPlayerProvider).play();
-            },
-          ),
-        ],
-      ),
     );
   }
 }

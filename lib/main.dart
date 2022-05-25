@@ -1,13 +1,16 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fluid/constants.dart';
 import 'package:fluid/pages/home_page.dart';
+import 'package:fluid/providers/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -15,7 +18,18 @@ void main() {
     ),
   );
 
-  runApp(const ProviderScope(child: FluidApp()));
+  /// [databasePathProvider] needs to be awaited here so that it's initialized
+  /// on the container, so that it's available for the database provider when
+  /// it's first read
+  final container = ProviderContainer();
+  await container.read(databasePathProvider.future);
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const FluidApp(),
+    ),
+  );
 }
 
 class FluidApp extends StatelessWidget {

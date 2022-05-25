@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "38.0.0"
+    version: "40.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.4.1"
+    version: "4.1.0"
   archive:
     dependency: transitive
     description:
@@ -176,6 +176,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.3"
+  dartx:
+    dependency: transitive
+    description:
+      name: dartx
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -196,7 +203,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.1"
   file:
     dependency: transitive
     description:
@@ -311,6 +318,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
+  id3:
+    dependency: transitive
+    description:
+      name: id3
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
   integration_test:
     dependency: "direct dev"
     description: flutter
@@ -330,6 +344,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  isar:
+    dependency: "direct main"
+    description:
+      name: isar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0-dev.0"
+  isar_flutter_libs:
+    dependency: "direct main"
+    description:
+      name: isar_flutter_libs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0-dev.0"
+  isar_generator:
+    dependency: "direct dev"
+    description:
+      name: isar_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0-dev.0"
   js:
     dependency: transitive
     description:
@@ -413,7 +448,7 @@ packages:
       name: mockito
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.0"
   nested:
     dependency: transitive
     description:
@@ -428,6 +463,24 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  on_audio_query:
+    dependency: "direct main"
+    description:
+      path: on_audio_query
+      ref: development
+      resolved-ref: "7ade5c1e2020b40680df77f3e75f6960f5e772bb"
+      url: "https://github.com/LiquidPL/on_audio_query.git"
+    source: git
+    version: "3.0.0-alpha.0"
+  on_audio_query_platform_interface:
+    dependency: transitive
+    description:
+      path: on_audio_query_platform_interface
+      ref: development
+      resolved-ref: d6f33c2d04c3be8ef713551fbad3df65bef842c5
+      url: "https://github.com/LucJosin/on_audio_query"
+    source: git
+    version: "1.4.0"
   package_config:
     dependency: transitive
     description:
@@ -457,12 +510,12 @@ packages:
     source: hosted
     version: "1.0.0"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.9"
+    version: "2.0.10"
   path_provider_android:
     dependency: transitive
     description:
@@ -750,6 +803,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.13"
+  time:
+    dependency: transitive
+    description:
+      name: time
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   timing:
     dependency: transitive
     description:

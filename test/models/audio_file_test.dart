@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('asAudioSource returns a valid instance with a valid url', () {
-    const audioFile = AudioFile(
+    final audioFile = AudioFile(
       uri: 'content://media/external/audio/media/727',
       title: 'test title',
       artist: 'test artist',
-      duration: Duration(minutes: 1, seconds: 20),
+      duration: const Duration(minutes: 1, seconds: 20),
     );
 
     final audioSource = audioFile.asAudioSource;

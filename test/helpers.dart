@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 import 'helpers.mocks.dart';
 
@@ -66,8 +67,8 @@ MockAudioPlayer mockPlayerWithNQueueElements({
 }) {
   final sequence = List<IndexedAudioSource>.generate(
     count,
-    (i) => AudioSource.uri(
-      Uri.parse('content://media/external/audio/media/$i'),
+    (index) => AudioSource.uri(
+      Uri.parse('content://media/external/audio/media/$index'),
     ),
   );
 
@@ -83,6 +84,19 @@ List<AudioFile> createListOfAudioFiles(int count) {
       artist: 'test artist',
       duration: const Duration(minutes: 1, seconds: 40),
     ),
+  );
+}
+
+List<AudioModel> createListOfAudioModels(int count) {
+  return List<AudioModel>.generate(
+    count,
+    (index) => AudioModel({
+      '_id': index,
+      '_uri': 'content://media/external/audio/media/$index',
+      'title': 'song $index',
+      'artist': 'test artist',
+      'duration': (const Duration(seconds: 100)).inMilliseconds,
+    }),
   );
 }
 

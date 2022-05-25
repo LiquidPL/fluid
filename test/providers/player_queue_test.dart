@@ -9,14 +9,14 @@ import 'package:mockito/mockito.dart';
 
 import 'player_queue_test.mocks.dart';
 
-const _audioFile1 = AudioFile(
+final _audioFile1 = AudioFile(
   uri: 'content://media/external/audio/media/1',
   title: 'title 1',
   artist: 'artist',
   duration: Duration.zero,
 );
 
-const _audioFile2 = AudioFile(
+final _audioFile2 = AudioFile(
   uri: 'content://media/external/audio/media/2',
   title: 'title 2',
   artist: 'artist',
