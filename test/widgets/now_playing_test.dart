@@ -10,7 +10,15 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../helpers.dart';
 
-enum ProgressBarPositions { start, middle, end }
+enum ProgressBarPositions {
+  start(0.0),
+  middle(0.5),
+  end(1.0);
+
+  const ProgressBarPositions(this.position);
+
+  final double position;
+}
 
 final ValueVariant<ProgressBarPositions> positionVariants =
     ValueVariant<ProgressBarPositions>(ProgressBarPositions.values.toSet());
@@ -157,15 +165,10 @@ void main() {
     testWidgets(
       'golden progress bar position',
       (tester) async {
-        final currentVariant = positionVariants.currentValue;
+        final currentVariant = positionVariants.currentValue!;
 
         const duration = Duration(hours: 2);
-
-        final Map<ProgressBarPositions, Duration> positionValues = {
-          ProgressBarPositions.start: Duration.zero,
-          ProgressBarPositions.middle: duration ~/ 2,
-          ProgressBarPositions.end: duration,
-        };
+        final position = duration * currentVariant.position;
 
         await tester.pumpWidget(
           ProviderScope(
@@ -174,8 +177,7 @@ void main() {
                   .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(duration)),
-              positionProvider.overrideWithValue(
-                  AsyncValue.data(positionValues[currentVariant])),
+              positionProvider.overrideWithValue(AsyncValue.data(position)),
               songTitleProvider
                   .overrideWithValue(const AsyncValue.data('test title')),
               songArtistProvider
@@ -206,7 +208,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final variantName = positionVariants.describeValue(currentVariant!);
+        final variantName = positionVariants.describeValue(currentVariant);
 
         await expectLater(
           find.byType(NowPlaying),
