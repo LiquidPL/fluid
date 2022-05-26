@@ -1,4 +1,4 @@
-import 'package:fluid/media_store.dart';
+import 'package:fluid/providers/media_store.dart';
 import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/providers/database.dart';
