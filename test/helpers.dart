@@ -1,5 +1,6 @@
 import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/widgets/album_cover.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
@@ -22,6 +23,23 @@ Future<void> precachePlaceholderAlbumCover(WidgetTester tester) async {
         SvgPicture.svgStringDecoderBuilder,
         'assets/placeholder-album-cover.svg',
       ),
+      tester.element(find.byType(AlbumCover)),
+    );
+  });
+
+  await tester.pumpAndSettle();
+}
+
+///
+/// Loads and caches the test image displayed as the album cover.
+/// This is necessary since the image is loaded asynchronously during runtime,
+/// and will not show up on golden tests as the image will not be loaded
+/// by the time the screenshot is taken.
+///
+Future<void> precacheTestAlbumCover(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    await precacheImage(
+      const ExactAssetImage('test/assets/test_cover.png'),
       tester.element(find.byType(AlbumCover)),
     );
   });

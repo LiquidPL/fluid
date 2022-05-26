@@ -75,8 +75,9 @@ void main() {
             songArtistProvider
                 .overrideWithValue(const AsyncValue.data('test artist')),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
+          child: MaterialApp(
+            theme: ThemeData(useMaterial3: true),
+            home: const Scaffold(
               body: MiniPlayer(height: 70.0),
             ),
           ),

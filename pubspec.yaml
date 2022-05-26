@@ -94,6 +94,9 @@ flutter:
   assets:
     - assets/placeholder-album-cover.svg
 
+    # Assets used for unit tests, ideally we'd remove them from release builds.
+    - test/assets/test_cover.png
+
     # Assets used for integration tests, ideally we'd remove them
     # from release builds.
     - integration_test/assets/silence_1m40s.ogg

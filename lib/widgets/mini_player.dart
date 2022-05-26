@@ -30,7 +30,7 @@ class MiniPlayer extends HookConsumerWidget {
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0)
                     .copyWith(right: 8.0),
-                child: const AlbumCover(),
+                child: const AlbumCover(isSmall: true),
               ),
               Expanded(
                 child: Column(
