@@ -62,7 +62,7 @@ void main() async {
 
       expect(file!.title, 'song 0');
       expect(file.artist, 'test artist');
-      expect(file.uri, 'content://media/external/audio/media/0');
+      expect(file.uri, 'asset:///integration_test/assets/silence_1m40s.ogg');
       expect(file.duration, const Duration(minutes: 1, seconds: 40));
     });
 

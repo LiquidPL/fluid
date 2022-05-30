@@ -34,20 +34,12 @@ class MediaStore {
 
     await database.writeTxn(
       (database) async {
-        for (final rawAudioFile in songs) {
-          if (rawAudioFile.uri == null) {
+        for (final audioModel in songs) {
+          if (audioModel.uri == null) {
             continue;
           }
 
-          final audioFile = AudioFile(
-            id: rawAudioFile.id,
-            uri: rawAudioFile.uri!,
-            title: rawAudioFile.title,
-            artist: rawAudioFile.artist ?? '',
-            duration: Duration(milliseconds: rawAudioFile.duration ?? 0),
-          );
-
-          await database.audioFiles.put(audioFile);
+          await database.audioFiles.put(AudioFile.fromAudioModel(audioModel));
         }
       },
     );

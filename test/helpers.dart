@@ -93,30 +93,23 @@ MockAudioPlayer mockPlayerWithNQueueElements({
   return mockPlayerWithQueue(sequence: sequence, currentIndex: currentIndex);
 }
 
-List<AudioFile> createListOfAudioFiles(int count) {
-  return List<AudioFile>.generate(
-    count,
-    (index) => AudioFile(
-      uri: 'asset:///integration_test/assets/silence_1m40s.ogg',
-      title: 'song $index',
-      artist: 'test artist',
-      duration: const Duration(minutes: 1, seconds: 40),
-    ),
-  );
-}
-
 List<AudioModel> createListOfAudioModels(int count) {
   return List<AudioModel>.generate(
     count,
     (index) => AudioModel({
       '_id': index,
-      '_uri': 'content://media/external/audio/media/$index',
+      '_uri': 'asset:///integration_test/assets/silence_1m40s.ogg',
       'title': 'song $index',
       'artist': 'test artist',
       'duration': (const Duration(seconds: 100)).inMilliseconds,
     }),
   );
 }
+
+List<AudioFile> createListOfAudioFiles(int count) =>
+    createListOfAudioModels(count)
+        .map((model) => AudioFile.fromAudioModel(model))
+        .toList();
 
 ConcatenatingAudioSource createListOfSources(int count) {
   return ConcatenatingAudioSource(
