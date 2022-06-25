@@ -64,7 +64,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   await ref.read(audioPlayerProvider).play();
                 },
                 child: const Text('play'),
-              )
+              ),
             ],
           ),
         ),

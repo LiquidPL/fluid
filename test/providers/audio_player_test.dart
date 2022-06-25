@@ -3,201 +3,277 @@ import 'package:fluid/providers/audio_player.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
-import 'audio_player_test.mocks.dart';
 
-@GenerateMocks([AudioPlayer, SequenceState])
+final _audioFile = AudioFile(
+  uri: 'content://media/external/audio/media/727',
+  title: 'test title',
+  artist: 'test artist',
+  duration: const Duration(minutes: 1, seconds: 30),
+);
+
+final _audioSource = ConcatenatingAudioSource(
+  children: [_audioFile.asAudioSource],
+);
+
+enum IsPlayingScenario {
+  yes(true),
+  no(false);
+
+  const IsPlayingScenario(this.isPlaying);
+
+  final bool isPlaying;
+}
+
 void main() {
   group('durationProvider', () {
     test(
-      'returns a valid duration',
+      'returns the duration of the currently playing song',
       () async {
-        final player = MockAudioPlayer();
-        const duration = Duration(minutes: 1, seconds: 30);
-
-        when(player.durationStream).thenAnswer((_) => Stream.value(duration));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(durationProvider, (_, AsyncValue<Duration?> next) {
-          expect(next.value, const Duration(minutes: 1, seconds: 30));
-        });
+        await player.setAudioSource(_audioSource);
 
-        verify(player.durationStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(durationProvider.future);
+
+        expect(
+          container.read(durationProvider).value,
+          const Duration(minutes: 1, seconds: 30),
+        );
       },
     );
   });
 
   group('positionProvider', () {
     test(
-      'returns a valid duration',
+      'returns the current position of the audio player',
       () async {
-        final player = MockAudioPlayer();
-        const position = Duration(seconds: 30);
-
-        when(player.positionStream).thenAnswer((_) => Stream.value(position));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(positionProvider, (_, AsyncValue<Duration?> next) {
-          expect(next.value, const Duration(seconds: 30));
-        });
+        await player.setAudioSource(
+          _audioSource,
+          initialPosition: const Duration(seconds: 30),
+        );
 
-        verify(player.positionStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(positionProvider.future);
+
+        expect(
+          container.read(positionProvider).value,
+          const Duration(seconds: 30),
+        );
+      },
+    );
+
+    test(
+      'returns a correct position after seeking',
+      () async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
+        final container = ProviderContainer(
+          overrides: [audioPlayerProvider.overrideWithValue(player)],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(_audioSource);
+
+        await container.read(positionProvider.future);
+
+        expect(
+          container.read(positionProvider).value,
+          const Duration(seconds: 0),
+        );
+
+        await player.seek(const Duration(seconds: 10));
+
+        await container.read(positionProvider.future);
+
+        expect(
+          container.read(positionProvider).value,
+          const Duration(seconds: 10),
+        );
+      },
+    );
+  });
+
+  group('isPlayingProvider', () {
+    test(
+      'returns true if the player is currently playing',
+      () async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
+        final container = ProviderContainer(
+          overrides: [audioPlayerProvider.overrideWithValue(player)],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(_audioSource);
+        player.play();
+
+        await container.read(isPlayingProvider.future);
+
+        expect(container.read(isPlayingProvider).value, isTrue);
+      },
+    );
+
+    test(
+      'returns false if the player is not currently playing',
+      () async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
+        final container = ProviderContainer(
+          overrides: [audioPlayerProvider.overrideWithValue(player)],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(_audioSource);
+        player.pause();
+
+        await container.read(isPlayingProvider.future);
+
+        expect(container.read(isPlayingProvider).value, isFalse);
       },
     );
   });
 
   group('songTitleProvider', () {
     test(
-      'returns a valid title',
+      'returns the title of the currently playing song',
       () async {
-        final audioFile = AudioFile(
-          uri: 'content://media/external/audio/media/727',
-          title: 'test title',
-          artist: 'test artist',
-          duration: const Duration(minutes: 1),
-        );
-
-        final player = MockAudioPlayer();
-        final sequenceState = MockSequenceState();
-
-        when(sequenceState.currentSource).thenReturn(audioFile.asAudioSource);
-        when(player.sequenceStateStream)
-            .thenAnswer((_) => Stream.value(sequenceState));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(songTitleProvider, (_, AsyncValue<String> next) {
-          expect(next.value, 'test title');
-        });
+        await player.setAudioSource(_audioSource);
 
-        verify(player.sequenceStateStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(songTitleProvider.future);
+
+        expect(
+          container.read(songTitleProvider).value,
+          'test title',
+        );
       },
     );
 
     test(
       'returns an empty string when there are no songs in the queue',
       () async {
-        final player = MockAudioPlayer();
-
-        when(player.sequenceStateStream).thenAnswer((_) => Stream.value(null));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(songTitleProvider, (_, AsyncValue<String> next) {
-          expect(next.value, '');
-        });
+        await player.setAudioSource(ConcatenatingAudioSource(children: []));
 
-        verify(player.sequenceStateStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(songTitleProvider.future);
+        expect(container.read(songTitleProvider).value, '');
       },
     );
   });
 
   group('songArtistProvider', () {
     test(
-      'returns a valid artist name',
+      'returns the artist of the currently playing song',
       () async {
-        final audioFile = AudioFile(
-          uri: 'content://media/external/audio/media/727',
-          title: 'test title',
-          artist: 'test artist',
-          duration: const Duration(minutes: 1),
-        );
-
-        final player = MockAudioPlayer();
-        final sequenceState = MockSequenceState();
-
-        when(sequenceState.currentSource).thenReturn(audioFile.asAudioSource);
-        when(player.sequenceStateStream)
-            .thenAnswer((_) => Stream.value(sequenceState));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(songArtistProvider, (_, AsyncValue<String> next) {
-          expect(next.value, 'test artist');
-        });
+        await player.setAudioSource(_audioSource);
 
-        verify(player.sequenceStateStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(songArtistProvider.future);
+
+        expect(
+          container.read(songArtistProvider).value,
+          'test artist',
+        );
       },
     );
 
     test(
       'returns an empty string when there are no songs in the queue',
       () async {
-        final player = MockAudioPlayer();
-
-        when(player.sequenceStateStream).thenAnswer((_) => Stream.value(null));
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(songArtistProvider, (_, AsyncValue<String> next) {
-          expect(next.value, '');
-        });
+        await player.setAudioSource(ConcatenatingAudioSource(children: []));
 
-        verify(player.sequenceStateStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(songArtistProvider.future);
+        expect(container.read(songArtistProvider).value, '');
       },
     );
   });
 
   group('currentQueueIndexProvider', () {
     test(
-      'returns a correct queue index',
+      'returns the index of the currently playing song in the queue list',
       () async {
-        final player = mockPlayerWithNQueueElements(count: 4, currentIndex: 2);
+        // final player = mockPlayerWithNQueueElements(count: 4, currentIndex: 2);
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         final container = ProviderContainer(
           overrides: [audioPlayerProvider.overrideWithValue(player)],
         );
         addTearDown(container.dispose);
 
-        container.listen(currentQueueIndexProvider, (_, AsyncValue<int?> next) {
-          expect(next.value, 2);
-        });
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 3),
+          initialIndex: 2,
+        );
 
-        verify(player.sequenceStateStream).called(1);
-        verifyNoMoreInteractions(player);
+        await container.read(currentQueueIndexProvider.future);
+        expect(container.read(currentQueueIndexProvider).value, 2);
       },
     );
 
-    test('returns null if there is no ', () async {
-      final player = MockAudioPlayer();
+    test(
+      'returns null if there is no song playing at the moment',
+      () async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
-      final container = ProviderContainer(
-        overrides: [audioPlayerProvider.overrideWithValue(player)],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [audioPlayerProvider.overrideWithValue(player)],
+        );
+        addTearDown(container.dispose);
 
-      container.listen(currentQueueIndexProvider, (_, AsyncValue<int?> next) {
-        expect(next.value, isNull);
-      });
-    });
+        await player.setAudioSource(ConcatenatingAudioSource(children: []));
+
+        await container.read(currentQueueIndexProvider.future);
+        expect(container.read(currentQueueIndexProvider).value, isNull);
+      },
+    );
   });
 }

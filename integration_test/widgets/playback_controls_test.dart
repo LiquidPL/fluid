@@ -36,7 +36,7 @@ void main() {
           ),
         );
 
-        await player.setAudioSource(createListOfSources(1));
+        await player.setAudioSource(createAudioSource(childrenCount: 1));
 
         if (isPlaying) {
           player.play();
@@ -86,7 +86,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -118,7 +118,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();
@@ -171,7 +171,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -202,7 +202,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();
@@ -234,7 +234,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 0);
 
         await tester.pumpAndSettle();
@@ -287,7 +287,7 @@ void main() {
           ),
         ));
 
-        await player.setAudioSource(createListOfSources(2));
+        await player.setAudioSource(createAudioSource(childrenCount: 2));
         await player.seek(Duration.zero, index: 1);
 
         await tester.pumpAndSettle();

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
 
@@ -158,11 +157,13 @@ void main() {
     testWidgets(
       'is enabled when not at the end of the queue',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(
-                  mockPlayerWithNQueueElements(count: 2, currentIndex: 0)),
+              audioPlayerProvider.overrideWithValue(player),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -170,6 +171,11 @@ void main() {
               ),
             ),
           ),
+        );
+
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 0,
         );
 
         await tester.pumpAndSettle();
@@ -187,11 +193,13 @@ void main() {
     testWidgets(
       'is disabled when at the end of the queue',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(
-                  mockPlayerWithNQueueElements(count: 2, currentIndex: 1)),
+              audioPlayerProvider.overrideWithValue(player),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -199,6 +207,11 @@ void main() {
               ),
             ),
           ),
+        );
+
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 1,
         );
 
         await tester.pumpAndSettle();
@@ -216,10 +229,13 @@ void main() {
     testWidgets(
       'is disabled when the queue is empty',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
+              audioPlayerProvider.overrideWithValue(player),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -229,33 +245,7 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle();
-
-        final buttonFinder = find.descendant(
-          of: find.byType(SkipNextButton),
-          matching: find.byType(IconButton),
-        );
-
-        expect(buttonFinder, findsOneWidget);
-        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
-      },
-    );
-
-    testWidgets(
-      'is disabled when the queue is null',
-      (tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              audioPlayerProvider.overrideWithValue(mockPlayerWithNullQueue()),
-            ],
-            child: const MaterialApp(
-              home: Scaffold(
-                body: SkipNextButton(),
-              ),
-            ),
-          ),
-        );
+        await player.setAudioSource(createAudioSource(childrenCount: 0));
 
         await tester.pumpAndSettle();
 
@@ -272,7 +262,9 @@ void main() {
     testWidgets(
       'skips to next song when pressed',
       (tester) async {
-        final player = mockPlayerWithNQueueElements(count: 2, currentIndex: 0);
+        // final player = mockPlayerWithNQueueElements(count: 2, currentIndex: 0);
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         await tester.pumpWidget(
           ProviderScope(
@@ -287,11 +279,17 @@ void main() {
           ),
         );
 
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 0,
+        );
+
         await tester.pumpAndSettle();
         await tester.tap(find.byType(SkipNextButton));
         await tester.pumpAndSettle();
 
-        verify(player.seekToNext()).called(1);
+        expect(player.currentIndex, 1);
+        // verify(player.seekToNext()).called(1);
       },
     );
   });
@@ -300,11 +298,12 @@ void main() {
     testWidgets(
       'is enabled when not at the beginning of the queue',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(ProviderScope(
           overrides: [
-            audioPlayerProvider.overrideWithValue(
-              mockPlayerWithNQueueElements(count: 2, currentIndex: 1),
-            ),
+            audioPlayerProvider.overrideWithValue(player),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -312,6 +311,11 @@ void main() {
             ),
           ),
         ));
+
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 1,
+        );
 
         await tester.pumpAndSettle();
 
@@ -328,11 +332,12 @@ void main() {
     testWidgets(
       'is disabled when at the beginning of the queue',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(ProviderScope(
           overrides: [
-            audioPlayerProvider.overrideWithValue(
-              mockPlayerWithNQueueElements(count: 2, currentIndex: 0),
-            ),
+            audioPlayerProvider.overrideWithValue(player),
           ],
           child: const MaterialApp(
             home: Scaffold(
@@ -340,6 +345,11 @@ void main() {
             ),
           ),
         ));
+
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 0,
+        );
 
         await tester.pumpAndSettle();
 
@@ -356,10 +366,13 @@ void main() {
     testWidgets(
       'is disabled when the queue is empty',
       (tester) async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
+              audioPlayerProvider.overrideWithValue(player),
             ],
             child: const MaterialApp(
               home: Scaffold(
@@ -369,33 +382,7 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle();
-
-        final buttonFinder = find.descendant(
-          of: find.byType(SkipPreviousButton),
-          matching: find.byType(IconButton),
-        );
-
-        expect(buttonFinder, findsOneWidget);
-        expect(tester.widget<IconButton>(buttonFinder).onPressed, isNull);
-      },
-    );
-
-    testWidgets(
-      'is disabled when the queue is null',
-      (tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              audioPlayerProvider.overrideWithValue(mockPlayerWithNullQueue()),
-            ],
-            child: const MaterialApp(
-              home: Scaffold(
-                body: SkipPreviousButton(),
-              ),
-            ),
-          ),
-        );
+        await player.setAudioSource(createAudioSource(childrenCount: 0));
 
         await tester.pumpAndSettle();
 
@@ -412,7 +399,8 @@ void main() {
     testWidgets(
       'skips to previous song when pressed',
       (tester) async {
-        final player = mockPlayerWithNQueueElements(count: 2, currentIndex: 1);
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
 
         await tester.pumpWidget(
           ProviderScope(
@@ -427,12 +415,16 @@ void main() {
           ),
         );
 
+        await player.setAudioSource(
+          createAudioSource(childrenCount: 2),
+          initialIndex: 1,
+        );
+
         await tester.pumpAndSettle();
         await tester.tap(find.byType(SkipPreviousButton));
         await tester.pumpAndSettle();
 
-        // verify(player.seek(Duration.zero, index: 1)).called(1);
-        verify(await player.seekToPrevious()).called(1);
+        expect(player.currentIndex, 0);
       },
     );
   });

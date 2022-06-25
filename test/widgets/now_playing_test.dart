@@ -1,3 +1,4 @@
+import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
 import 'package:fluid/widgets/now_playing.dart';
 import 'package:fluid/widgets/now_playing_queue.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../helpers.dart';
@@ -57,16 +59,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider
-                  .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
-              positionProvider
-                  .overrideWithValue(const AsyncValue.data(Duration.zero)),
-              durationProvider
-                  .overrideWithValue(const AsyncValue.data(Duration.zero)),
-              songTitleProvider
-                  .overrideWithValue(const AsyncValue.data('test title')),
-              songArtistProvider
-                  .overrideWithValue(const AsyncValue.data('test artist')),
+              audioPlayerProvider.overrideWithProvider(fakeAudioPlayerProvider),
             ],
             child: MaterialApp(
               theme: ThemeData(useMaterial3: true),
@@ -76,6 +69,25 @@ void main() {
                 body: NowPlaying(),
               ),
             ),
+          ),
+        );
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MaterialApp)),
+        );
+
+        final player = container.read(audioPlayerProvider);
+        await player.setAudioSource(
+          ConcatenatingAudioSource(
+            children: [
+              AudioFile(
+                id: 727,
+                uri: 'content://media/external/audio/media/727',
+                title: 'test title',
+                artist: 'test artist',
+                duration: const Duration(minutes: 1, seconds: 30),
+              ).asAudioSource
+            ],
           ),
         );
 
@@ -173,8 +185,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              audioPlayerProvider
-                  .overrideWithValue(mockPlayerWithNQueueElements(count: 1)),
+              audioPlayerProvider.overrideWithProvider(fakeAudioPlayerProvider),
               durationProvider
                   .overrideWithValue(const AsyncValue.data(duration)),
               positionProvider.overrideWithValue(AsyncValue.data(position)),

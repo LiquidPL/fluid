@@ -69,7 +69,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            audioPlayerProvider.overrideWithValue(mockPlayerWithEmptyQueue()),
+            audioPlayerProvider.overrideWithProvider(fakeAudioPlayerProvider),
             songTitleProvider
                 .overrideWithValue(const AsyncValue.data('test title')),
             songArtistProvider
