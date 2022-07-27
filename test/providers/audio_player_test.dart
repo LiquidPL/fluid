@@ -1,10 +1,15 @@
 import 'package:fluid/models/audio_file.dart';
 import 'package:fluid/providers/audio_player.dart';
+import 'package:fluid/providers/permission_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../helpers.dart';
+import 'audio_player_test.mocks.dart';
 
 final _audioFile = AudioFile(
   uri: 'content://media/external/audio/media/727',
@@ -26,6 +31,7 @@ enum IsPlayingScenario {
   final bool isPlaying;
 }
 
+@GenerateMocks([PermissionService])
 void main() {
   group('durationProvider', () {
     test(
@@ -273,6 +279,94 @@ void main() {
 
         await container.read(currentQueueIndexProvider.future);
         expect(container.read(currentQueueIndexProvider).value, isNull);
+      },
+    );
+  });
+
+  group('currentAudioFileProvider', () {
+    test('returns null if there is no song playing at the moment', () async {
+      final player = FakeAudioPlayer();
+      addTearDown(player.dispose);
+
+      final container = ProviderContainer(
+        overrides: [audioPlayerProvider.overrideWithValue(player)],
+      );
+      addTearDown(container.dispose);
+
+      await player.setAudioSource(ConcatenatingAudioSource(children: []));
+
+      await container.read(currentAudioFileProvider.future);
+      expect(container.read(currentAudioFileProvider).value, isNull);
+    });
+
+    test(
+      'returns an AudioFile when there is a song playing',
+      () async {
+        final player = FakeAudioPlayer();
+        addTearDown(player.dispose);
+
+        final container = ProviderContainer(
+          overrides: [audioPlayerProvider.overrideWithValue(player)],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(createAudioSource(childrenCount: 1));
+
+        await container.read(currentAudioFileProvider.future);
+        expect(
+          container.read(currentAudioFileProvider).value,
+          isA<AudioFile>(),
+        );
+      },
+    );
+  });
+
+  group('currentArtworkModelProvider', () {
+    test(
+      'returns null if there is no song playing at the moment',
+      () async {
+        final permissionService = MockPermissionService();
+        when(permissionService.status(Permission.storage)).thenAnswer(
+            (_) => Future<PermissionStatus>.value(PermissionStatus.granted));
+
+        final player = FakeAudioPlayer();
+
+        final container = ProviderContainer(
+          overrides: [
+            audioPlayerProvider.overrideWithValue(player),
+            permissionServiceProvider.overrideWithValue(permissionService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(ConcatenatingAudioSource(children: []));
+
+        await container.read(currentArtworkModelProvider.future);
+        expect(container.read(currentArtworkModelProvider).value, isNull);
+      },
+    );
+
+    test(
+      'returns null if user did not grand storage permissions',
+      () async {
+        final permissionService = MockPermissionService();
+        when(permissionService.status(Permission.storage)).thenAnswer(
+            (_) => Future<PermissionStatus>.value(PermissionStatus.denied));
+
+        final player = FakeAudioPlayer();
+
+        final container = ProviderContainer(
+          overrides: [
+            permissionServiceProvider.overrideWithValue(permissionService),
+            audioPlayerProvider.overrideWithValue(player),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await player.setAudioSource(ConcatenatingAudioSource(children: []));
+
+        await container.read(currentArtworkModelProvider.future);
+        expect(container.read(currentArtworkModelProvider).value, isNull);
       },
     );
   });

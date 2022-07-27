@@ -16,6 +16,8 @@ class MiniPlayer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final artworkModel = ref.watch(currentArtworkModelProvider).value;
+
     return Material(
       color: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
@@ -30,7 +32,15 @@ class MiniPlayer extends HookConsumerWidget {
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0)
                     .copyWith(right: 8.0),
-                child: const AlbumCover(isSmall: true),
+                child: AlbumCover(
+                  isSmall: true,
+                  image: artworkModel != null && artworkModel.artwork != null
+                      ? Image.memory(
+                          artworkModel.artwork!,
+                          gaplessPlayback: true,
+                        )
+                      : null,
+                ),
               ),
               Expanded(
                 child: Column(

@@ -65,12 +65,19 @@ class _QueueItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final artworkModel = ref.watch(artworkModelProvider(audioFile.id!)).value;
+
     return ListTile(
       title: Text(audioFile.title),
       subtitle: Text(
         '${audioFile.artist} • ${formatDuration(audioFile.duration)}',
       ),
-      leading: const AlbumCover(),
+      leading: AlbumCover(
+        isSmall: true,
+        image: artworkModel != null && artworkModel.artwork != null
+            ? Image.memory(artworkModel.artwork!)
+            : null,
+      ),
       trailing: Text((queueIndex + 1).toString()),
       selected: ref.watch(currentQueueIndexProvider).value == queueIndex,
       tileColor: Theme.of(context).colorScheme.surface,

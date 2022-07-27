@@ -18,6 +18,8 @@ class NowPlaying extends ConsumerWidget {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
+    final artworkModel = ref.watch(currentArtworkModelProvider).value;
+
     return _PlayerQueuePanel(
       body: Material(
         child: SafeArea(
@@ -36,7 +38,12 @@ class NowPlaying extends ConsumerWidget {
                     ? const EdgeInsets.symmetric(
                         horizontal: 32.0, vertical: 8.0)
                     : null,
-                child: const AlbumCover(),
+                child: AlbumCover(
+                  image: artworkModel != null && artworkModel.artwork != null
+                      ? Image.memory(artworkModel.artwork!,
+                          gaplessPlayback: true)
+                      : null,
+                ),
               ),
               Expanded(
                 child: Container(
